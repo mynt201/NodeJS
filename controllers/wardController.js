@@ -14,6 +14,7 @@ const getWards = async(req, res) => {
         if (req.query.district) filter.district = req.query.district;
         if (req.query.province) filter.province = req.query.province;
         if (req.query.risk_level) filter.risk_level = req.query.risk_level;
+        if (req.query.ward_name) filter.ward_name = req.query.ward_name;
 
         // Build sort
         const sortBy = req.query.sort || 'flood_risk';

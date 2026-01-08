@@ -5,6 +5,7 @@ const WeatherData = require('./WeatherData');
 const DrainageData = require('./DrainageData');
 const RoadBridgeData = require('./RoadBridgeData');
 const RiskIndexData = require('./RiskIndexData');
+const Settings = require('./Settings');
 
 module.exports = {
     User,
@@ -12,7 +13,8 @@ module.exports = {
     WeatherData,
     DrainageData,
     RoadBridgeData,
-    RiskIndexData
+    RiskIndexData,
+    Settings
 };
 
 // Export individual models for direct access
@@ -22,3 +24,4 @@ module.exports.WeatherData = WeatherData;
 module.exports.DrainageData = DrainageData;
 module.exports.RoadBridgeData = RoadBridgeData;
 module.exports.RiskIndexData = RiskIndexData;
+module.exports.Settings = Settings;

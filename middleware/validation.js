@@ -51,9 +51,10 @@ const userValidation = {
   ],
 
   login: [
-    body('username')
-      .notEmpty()
-      .withMessage('Username is required'),
+    body('email')
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Valid email is required'),
 
     body('password')
       .notEmpty()
@@ -268,6 +269,71 @@ const idValidation = [
   handleValidationErrors
 ];
 
+// Settings validation rules
+const settingsValidation = {
+  update: [
+    body('theme')
+      .optional()
+      .isIn(['light', 'dark', 'auto'])
+      .withMessage('Theme must be light, dark, or auto'),
+
+    body('language')
+      .optional()
+      .isIn(['vi', 'en'])
+      .withMessage('Language must be vi or en'),
+
+    body('dashboard.defaultView')
+      .optional()
+      .isIn(['map', 'dashboard', 'analytics'])
+      .withMessage('Default view must be map, dashboard, or analytics'),
+
+    body('dashboard.refreshInterval')
+      .optional()
+      .isInt({ min: 30, max: 3600 })
+      .withMessage('Refresh interval must be between 30 and 3600 seconds'),
+
+    body('riskThresholds.veryLow')
+      .optional()
+      .isFloat({ min: 0, max: 10 })
+      .withMessage('Very low threshold must be between 0 and 10'),
+
+    body('riskThresholds.low')
+      .optional()
+      .isFloat({ min: 0, max: 10 })
+      .withMessage('Low threshold must be between 0 and 10'),
+
+    body('riskThresholds.medium')
+      .optional()
+      .isFloat({ min: 0, max: 10 })
+      .withMessage('Medium threshold must be between 0 and 10'),
+
+    body('riskThresholds.high')
+      .optional()
+      .isFloat({ min: 0, max: 10 })
+      .withMessage('High threshold must be between 0 and 10'),
+
+    body('riskThresholds.veryHigh')
+      .optional()
+      .isFloat({ min: 0, max: 10 })
+      .withMessage('Very high threshold must be between 0 and 10'),
+
+    handleValidationErrors
+  ],
+
+  notifications: [
+    body('type')
+      .isIn(['email', 'browser', 'sms'])
+      .withMessage('Notification type must be email, browser, or sms'),
+
+    body('settings.enabled')
+      .optional()
+      .isBoolean()
+      .withMessage('Enabled must be a boolean'),
+
+    handleValidationErrors
+  ]
+};
+
 // Query validation for pagination and filtering
 const queryValidation = {
   pagination: [
@@ -294,6 +360,7 @@ module.exports = {
   userValidation,
   wardValidation,
   weatherValidation,
+  settingsValidation,
   idValidation,
   queryValidation,
   handleValidationErrors

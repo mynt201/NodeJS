@@ -1,0 +1,1285 @@
+{
+    "users": [{
+            "username": "admin",
+            "email": "admin@floodrisk.com",
+            "password": "$2b$10$6Nnm9bKGywWc4gmKyEvWwefsfJngezedBoot8x1uF.m.UjXRkFqWW",
+            "role": "admin",
+            "fullName": "System Administrator",
+            "phone": "+84-123-456-789",
+            "address": "123 Admin Street, District 1, Ho Chi Minh City",
+            "isActive": true
+        },
+        {
+            "username": "flood_manager",
+            "email": "manager@floodrisk.com",
+            "password": "$2b$10$6Nnm9bKGywWc4gmKyEvWwefsfJngezedBoot8x1uF.m.UjXRkFqWW",
+            "role": "user",
+            "fullName": "Flood Risk Manager",
+            "phone": "+84-987-654-321",
+            "address": "456 Manager Avenue, District 3, Ho Chi Minh City",
+            "isActive": true
+        },
+        {
+            "username": "district_officer",
+            "email": "officer@floodrisk.com",
+            "password": "$2b$10$6Nnm9bKGywWc4gmKyEvWwefsfJngezedBoot8x1uF.m.UjXRkFqWW",
+            "role": "user",
+            "fullName": "District Officer Nguyen",
+            "phone": "+84-555-123-456",
+            "address": "789 Officer Road, District 7, Ho Chi Minh City",
+            "isActive": true
+        },
+        {
+            "username": "researcher",
+            "email": "researcher@university.edu.vn",
+            "password": "$2b$10$6Nnm9bKGywWc4gmKyEvWwefsfJngezedBoot8x1uF.m.UjXRkFqWW",
+            "role": "user",
+            "fullName": "Dr. Tran Thi Research",
+            "phone": "+84-111-222-333",
+            "address": "101 University Campus, Thu Duc City",
+            "isActive": true
+        }
+    ],
+    "wards": [{
+            "_id": "507f1f77bcf86cd799439011",
+            "ward_name": "Ben Nghe",
+            "district": "District 1",
+            "province": "Ho Chi Minh City",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [106.688, 10.771],
+                        [106.692, 10.771],
+                        [106.692, 10.775],
+                        [106.688, 10.775],
+                        [106.688, 10.771]
+                    ]
+                ]
+            },
+            "population_density": 15000,
+            "rainfall": 1800,
+            "low_elevation": 2.5,
+            "urban_land": 85,
+            "drainage_capacity": 6.5,
+            "population": 25000,
+            "area_km2": 2.1,
+            "infrastructure_count": {
+                "roads": 15,
+                "bridges": 3,
+                "drainage_systems": 8
+            },
+            "isActive": true
+        },
+        {
+            "_id": "507f1f77bcf86cd799439012",
+            "ward_name": "Da Kao",
+            "district": "District 1",
+            "province": "Ho Chi Minh City",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [106.685, 10.775],
+                        [106.690, 10.775],
+                        [106.690, 10.780],
+                        [106.685, 10.780],
+                        [106.685, 10.775]
+                    ]
+                ]
+            },
+            "population_density": 12000,
+            "rainfall": 1750,
+            "low_elevation": 1.8,
+            "urban_land": 78,
+            "drainage_capacity": 7.2,
+            "population": 18000,
+            "area_km2": 1.8,
+            "infrastructure_count": {
+                "roads": 12,
+                "bridges": 2,
+                "drainage_systems": 6
+            },
+            "isActive": true
+        },
+        {
+            "_id": "507f1f77bcf86cd799439013",
+            "ward_name": "Nguyen Thai Binh",
+            "district": "District 1",
+            "province": "Ho Chi Minh City",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [106.682, 10.768],
+                        [106.687, 10.768],
+                        [106.687, 10.773],
+                        [106.682, 10.773],
+                        [106.682, 10.768]
+                    ]
+                ]
+            },
+            "population_density": 18000,
+            "rainfall": 1900,
+            "low_elevation": 1.2,
+            "urban_land": 92,
+            "drainage_capacity": 5.8,
+            "population": 32000,
+            "area_km2": 1.9,
+            "infrastructure_count": {
+                "roads": 18,
+                "bridges": 4,
+                "drainage_systems": 10
+            },
+            "isActive": true
+        },
+        {
+            "_id": "507f1f77bcf86cd799439014",
+            "ward_name": "Tan Dinh",
+            "district": "District 1",
+            "province": "Ho Chi Minh City",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [106.675, 10.785],
+                        [106.680, 10.785],
+                        [106.680, 10.790],
+                        [106.675, 10.790],
+                        [106.675, 10.785]
+                    ]
+                ]
+            },
+            "population_density": 22000,
+            "rainfall": 1950,
+            "low_elevation": 0.8,
+            "urban_land": 95,
+            "drainage_capacity": 4.9,
+            "population": 28000,
+            "area_km2": 1.5,
+            "infrastructure_count": {
+                "roads": 20,
+                "bridges": 1,
+                "drainage_systems": 12
+            },
+            "isActive": true
+        },
+        {
+            "_id": "507f1f77bcf86cd799439015",
+            "ward_name": "Phu Nhuan",
+            "district": "Phu Nhuan",
+            "province": "Ho Chi Minh City",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [106.665, 10.795],
+                        [106.670, 10.795],
+                        [106.670, 10.800],
+                        [106.665, 10.800],
+                        [106.665, 10.795]
+                    ]
+                ]
+            },
+            "population_density": 25000,
+            "rainfall": 2100,
+            "low_elevation": 0.5,
+            "urban_land": 98,
+            "drainage_capacity": 4.2,
+            "population": 35000,
+            "area_km2": 1.7,
+            "infrastructure_count": {
+                "roads": 22,
+                "bridges": 2,
+                "drainage_systems": 15
+            },
+            "isActive": true
+        }
+    ],
+    "weather_data": [{
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-07T00:00:00.000Z",
+            "temperature": {
+                "current": 28.5,
+                "min": 25.2,
+                "max": 32.1,
+                "feels_like": 30.2
+            },
+            "humidity": 78,
+            "rainfall": 15.5,
+            "wind_speed": 12.5,
+            "wind_direction": 180,
+            "wind_gust": 18.2,
+            "pressure": 1008,
+            "visibility": 8500,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "moderate rain",
+                "icon": "10d"
+            },
+            "uv_index": 6.2,
+            "aqi": 85,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 95
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-08T00:00:00.000Z",
+            "temperature": {
+                "current": 28.5,
+                "min": 25.2,
+                "max": 32.1,
+                "feels_like": 30.2
+            },
+            "humidity": 78,
+            "rainfall": 15.5,
+            "wind_speed": 12.5,
+            "wind_direction": 180,
+            "wind_gust": 18.2,
+            "pressure": 1008,
+            "visibility": 8500,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "moderate rain",
+                "icon": "10d"
+            },
+            "uv_index": 6.2,
+            "aqi": 85,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 95
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-09T00:00:00.000Z",
+            "temperature": {
+                "current": 29.2,
+                "min": 26.1,
+                "max": 33.8,
+                "feels_like": 31.5
+            },
+            "humidity": 75,
+            "rainfall": 8.3,
+            "wind_speed": 10.2,
+            "wind_direction": 190,
+            "wind_gust": 16.8,
+            "pressure": 1010,
+            "visibility": 9500,
+            "weather_condition": {
+                "main": "Clouds",
+                "description": "few clouds",
+                "icon": "02d"
+            },
+            "uv_index": 7.5,
+            "aqi": 65,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 97
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-10T00:00:00.000Z",
+            "temperature": {
+                "current": 30.1,
+                "min": 27.3,
+                "max": 34.2,
+                "feels_like": 32.8
+            },
+            "humidity": 72,
+            "rainfall": 2.1,
+            "wind_speed": 8.5,
+            "wind_direction": 200,
+            "wind_gust": 14.2,
+            "pressure": 1012,
+            "visibility": 10000,
+            "weather_condition": {
+                "main": "Clear",
+                "description": "clear sky",
+                "icon": "01d"
+            },
+            "uv_index": 8.2,
+            "aqi": 55,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 99
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-11T00:00:00.000Z",
+            "temperature": {
+                "current": 31.5,
+                "min": 28.7,
+                "max": 35.8,
+                "feels_like": 34.2
+            },
+            "humidity": 68,
+            "rainfall": 0.5,
+            "wind_speed": 6.8,
+            "wind_direction": 210,
+            "wind_gust": 12.5,
+            "pressure": 1014,
+            "visibility": 10000,
+            "weather_condition": {
+                "main": "Clear",
+                "description": "clear sky",
+                "icon": "01d"
+            },
+            "uv_index": 8.8,
+            "aqi": 45,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 100
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-12T00:00:00.000Z",
+            "temperature": {
+                "current": 29.8,
+                "min": 26.9,
+                "max": 33.5,
+                "feels_like": 32.1
+            },
+            "humidity": 74,
+            "rainfall": 5.2,
+            "wind_speed": 9.1,
+            "wind_direction": 185,
+            "wind_gust": 15.8,
+            "pressure": 1009,
+            "visibility": 9800,
+            "weather_condition": {
+                "main": "Clouds",
+                "description": "scattered clouds",
+                "icon": "03d"
+            },
+            "uv_index": 7.2,
+            "aqi": 62,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 96
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-13T00:00:00.000Z",
+            "temperature": {
+                "current": 27.9,
+                "min": 24.8,
+                "max": 31.8,
+                "feels_like": 29.8
+            },
+            "humidity": 80,
+            "rainfall": 18.7,
+            "wind_speed": 13.2,
+            "wind_direction": 170,
+            "wind_gust": 20.5,
+            "pressure": 1006,
+            "visibility": 7200,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "light rain",
+                "icon": "10d"
+            },
+            "uv_index": 5.5,
+            "aqi": 78,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 93
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-14T00:00:00.000Z",
+            "temperature": {
+                "current": 26.8,
+                "min": 23.5,
+                "max": 30.2,
+                "feels_like": 28.5
+            },
+            "humidity": 85,
+            "rainfall": 25.3,
+            "wind_speed": 16.8,
+            "wind_direction": 160,
+            "wind_gust": 24.2,
+            "pressure": 1004,
+            "visibility": 5500,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "heavy rain",
+                "icon": "10d"
+            },
+            "uv_index": 4.8,
+            "aqi": 88,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 91
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-08T00:00:00.000Z",
+            "temperature": {
+                "current": 29.1,
+                "min": 26.8,
+                "max": 33.5,
+                "feels_like": 31.8
+            },
+            "humidity": 75,
+            "rainfall": 8.2,
+            "wind_speed": 10.2,
+            "wind_direction": 190,
+            "wind_gust": 16.8,
+            "pressure": 1010,
+            "visibility": 9500,
+            "weather_condition": {
+                "main": "Clouds",
+                "description": "few clouds",
+                "icon": "02d"
+            },
+            "uv_index": 7.5,
+            "aqi": 65,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 97
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-09T00:00:00.000Z",
+            "temperature": {
+                "current": 27.9,
+                "min": 24.8,
+                "max": 31.8,
+                "feels_like": 29.8
+            },
+            "humidity": 80,
+            "rainfall": 18.7,
+            "wind_speed": 13.2,
+            "wind_direction": 170,
+            "wind_gust": 20.5,
+            "pressure": 1006,
+            "visibility": 7200,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "light rain",
+                "icon": "10d"
+            },
+            "uv_index": 5.5,
+            "aqi": 78,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 93
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-10T00:00:00.000Z",
+            "temperature": {
+                "current": 30.1,
+                "min": 27.3,
+                "max": 34.2,
+                "feels_like": 32.8
+            },
+            "humidity": 72,
+            "rainfall": 2.1,
+            "wind_speed": 8.5,
+            "wind_direction": 200,
+            "wind_gust": 14.2,
+            "pressure": 1012,
+            "visibility": 10000,
+            "weather_condition": {
+                "main": "Clear",
+                "description": "clear sky",
+                "icon": "01d"
+            },
+            "uv_index": 8.2,
+            "aqi": 55,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 99
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-11T00:00:00.000Z",
+            "temperature": {
+                "current": 31.5,
+                "min": 28.7,
+                "max": 35.8,
+                "feels_like": 34.2
+            },
+            "humidity": 68,
+            "rainfall": 0.5,
+            "wind_speed": 6.8,
+            "wind_direction": 210,
+            "wind_gust": 12.5,
+            "pressure": 1014,
+            "visibility": 10000,
+            "weather_condition": {
+                "main": "Clear",
+                "description": "clear sky",
+                "icon": "01d"
+            },
+            "uv_index": 8.8,
+            "aqi": 45,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 100
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-12T00:00:00.000Z",
+            "temperature": {
+                "current": 29.8,
+                "min": 26.9,
+                "max": 33.5,
+                "feels_like": 32.1
+            },
+            "humidity": 74,
+            "rainfall": 5.2,
+            "wind_speed": 9.1,
+            "wind_direction": 185,
+            "wind_gust": 15.8,
+            "pressure": 1009,
+            "visibility": 9800,
+            "weather_condition": {
+                "main": "Clouds",
+                "description": "scattered clouds",
+                "icon": "03d"
+            },
+            "uv_index": 7.2,
+            "aqi": 62,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 96
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2026-01-13T00:00:00.000Z",
+            "temperature": {
+                "current": 26.8,
+                "min": 23.5,
+                "max": 30.2,
+                "feels_like": 28.5
+            },
+            "humidity": 85,
+            "rainfall": 125.3,
+            "wind_speed": 16.8,
+            "wind_direction": 160,
+            "wind_gust": 24.2,
+            "pressure": 1004,
+            "visibility": 5500,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "heavy rain",
+                "icon": "10d"
+            },
+            "uv_index": 4.8,
+            "aqi": 88,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 91
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439012",
+            "date": "2024-01-08T00:00:00.000Z",
+            "temperature": {
+                "current": 29.1,
+                "min": 26.8,
+                "max": 33.5,
+                "feels_like": 31.8
+            },
+            "humidity": 75,
+            "rainfall": 8.2,
+            "wind_speed": 8.9,
+            "wind_direction": 195,
+            "wind_gust": 15.6,
+            "pressure": 1006,
+            "visibility": 9200,
+            "weather_condition": {
+                "main": "Clouds",
+                "description": "broken clouds",
+                "icon": "04d"
+            },
+            "uv_index": 7.1,
+            "aqi": 72,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 98
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439013",
+            "date": "2024-01-08T00:00:00.000Z",
+            "temperature": {
+                "current": 27.8,
+                "min": 24.5,
+                "max": 31.2,
+                "feels_like": 29.8
+            },
+            "humidity": 82,
+            "rainfall": 22.1,
+            "wind_speed": 15.2,
+            "wind_direction": 165,
+            "wind_gust": 22.8,
+            "pressure": 1005,
+            "visibility": 6800,
+            "weather_condition": {
+                "main": "Rain",
+                "description": "heavy rain",
+                "icon": "10d"
+            },
+            "uv_index": 5.8,
+            "aqi": 95,
+            "data_source": "weather_api",
+            "is_forecast": false,
+            "confidence_level": 92
+        }
+    ],
+    "drainage_data": [{
+            "ward_id": "507f1f77bcf86cd799439011",
+            "name": "Ben Nghe Main Drainage Canal",
+            "type": "canal",
+            "coordinates": {
+                "latitude": 10.772,
+                "longitude": 106.690
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [106.688, 10.771],
+                    [106.692, 10.775]
+                ]
+            },
+            "length": 850,
+            "width": 8.5,
+            "depth": 3.2,
+            "design_capacity": 25.5,
+            "current_capacity": 22.1,
+            "efficiency_percentage": 86.7,
+            "condition": "good",
+            "condition_score": 3,
+            "last_inspection_date": "2024-01-01T00:00:00.000Z",
+            "next_maintenance_date": "2024-03-01T00:00:00.000Z",
+            "status": "operational",
+            "environmental_impact": {
+                "water_quality": "good",
+                "sediment_accumulation": 15.2,
+                "pollution_level": "moderate"
+            },
+            "construction_year": 1995,
+            "estimated_value": 2500000,
+            "annual_maintenance_cost": 150000,
+            "data_source": "survey",
+            "verified": true,
+            "notes": "Main drainage system for Ben Nghe ward, requires regular sediment removal"
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "name": "Ben Nghe Pump Station A",
+            "type": "pump_station",
+            "coordinates": {
+                "latitude": 10.773,
+                "longitude": 106.691
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [106.691, 10.773]
+            },
+            "design_capacity": 15.8,
+            "current_capacity": 14.2,
+            "efficiency_percentage": 89.9,
+            "condition": "excellent",
+            "condition_score": 4,
+            "last_inspection_date": "2024-01-05T00:00:00.000Z",
+            "next_maintenance_date": "2024-04-05T00:00:00.000Z",
+            "status": "operational",
+            "is_automated": true,
+            "environmental_impact": {
+                "water_quality": "excellent",
+                "sediment_accumulation": 5.1,
+                "pollution_level": "low"
+            },
+            "construction_year": 2008,
+            "estimated_value": 1800000,
+            "annual_maintenance_cost": 120000,
+            "data_source": "survey",
+            "verified": true,
+            "notes": "Automated pump station with backup generator"
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439013",
+            "name": "Nguyen Thai Binh Storm Drain",
+            "type": "open_drain",
+            "coordinates": {
+                "latitude": 10.770,
+                "longitude": 106.684
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [106.682, 10.768],
+                    [106.687, 10.773]
+                ]
+            },
+            "length": 620,
+            "width": 1.8,
+            "depth": 1.5,
+            "design_capacity": 8.9,
+            "current_capacity": 6.2,
+            "efficiency_percentage": 69.7,
+            "condition": "fair",
+            "condition_score": 2,
+            "last_inspection_date": "2023-12-15T00:00:00.000Z",
+            "next_maintenance_date": "2024-02-15T00:00:00.000Z",
+            "status": "operational",
+            "environmental_impact": {
+                "water_quality": "fair",
+                "sediment_accumulation": 35.8,
+                "pollution_level": "high"
+            },
+            "construction_year": 1992,
+            "estimated_value": 850000,
+            "annual_maintenance_cost": 95000,
+            "data_source": "manual_entry",
+            "verified": false,
+            "notes": "Requires urgent cleaning and sediment removal"
+        }
+    ],
+    "road_bridge_data": [{
+            "ward_id": "507f1f77bcf86cd799439011",
+            "name": "Ham Nghi Boulevard",
+            "type": "boulevard",
+            "coordinates": {
+                "start_latitude": 10.771,
+                "start_longitude": 106.688,
+                "end_latitude": 10.775,
+                "end_longitude": 106.692
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [106.688, 10.771],
+                    [106.692, 10.775]
+                ]
+            },
+            "length": 850,
+            "width": 25,
+            "lanes": 6,
+            "surface_type": "asphalt",
+            "flood_level": 3.2,
+            "elevation_above_sea_level": 4.5,
+            "traffic_volume": {
+                "daily_average": 25000,
+                "peak_hour": 4200
+            },
+            "condition": "good",
+            "condition_score": 3,
+            "last_inspection_date": "2024-01-02T00:00:00.000Z",
+            "next_inspection_date": "2024-07-02T00:00:00.000Z",
+            "status": "operational",
+            "criticality_level": "high",
+            "estimated_value": 15000000,
+            "annual_maintenance_cost": 450000,
+            "data_source": "survey",
+            "verified": true,
+            "notes": "Major traffic artery, high criticality for flood response"
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439011",
+            "name": "Ben Nghe Bridge",
+            "type": "bridge",
+            "coordinates": {
+                "start_latitude": 10.772,
+                "start_longitude": 106.690,
+                "end_latitude": 10.773,
+                "end_longitude": 106.692
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [106.690, 10.772],
+                    [106.692, 10.773]
+                ]
+            },
+            "length": 45,
+            "width": 15,
+            "lanes": 4,
+            "surface_type": "concrete",
+            "flood_level": 4.8,
+            "elevation_above_sea_level": 3.2,
+            "flood_history": [{
+                    "date": "2023-09-15T00:00:00.000Z",
+                    "flood_depth": 0.8,
+                    "duration_hours": 12,
+                    "impact": "moderate",
+                    "description": "Minor flooding during heavy rain event"
+                },
+                {
+                    "date": "2022-08-22T00:00:00.000Z",
+                    "flood_depth": 1.2,
+                    "duration_hours": 18,
+                    "impact": "severe",
+                    "description": "Significant traffic disruption due to flooding"
+                }
+            ],
+            "structural_data": {
+                "material": "concrete",
+                "construction_year": 1998,
+                "design_load": "heavy",
+                "span_count": 3,
+                "max_span_length": 18
+            },
+            "traffic_volume": {
+                "daily_average": 18000,
+                "peak_hour": 3100
+            },
+            "condition": "good",
+            "condition_score": 3,
+            "last_inspection_date": "2024-01-03T00:00:00.000Z",
+            "next_inspection_date": "2024-07-03T00:00:00.000Z",
+            "status": "operational",
+            "criticality_level": "critical",
+            "estimated_value": 8500000,
+            "annual_maintenance_cost": 320000,
+            "data_source": "inspection_report",
+            "verified": true,
+            "notes": "Critical infrastructure bridge, regular monitoring required"
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439013",
+            "name": "Nguyen Thai Binh Street",
+            "type": "street",
+            "coordinates": {
+                "start_latitude": 10.768,
+                "start_longitude": 106.682,
+                "end_latitude": 10.773,
+                "end_longitude": 106.687
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [106.682, 10.768],
+                    [106.687, 10.773]
+                ]
+            },
+            "length": 620,
+            "width": 12,
+            "lanes": 2,
+            "surface_type": "asphalt",
+            "flood_level": 6.8,
+            "elevation_above_sea_level": 1.8,
+            "flood_history": [{
+                "date": "2023-10-08T00:00:00.000Z",
+                "flood_depth": 1.5,
+                "duration_hours": 24,
+                "impact": "critical",
+                "description": "Road completely flooded, impassable for 24 hours"
+            }],
+            "traffic_volume": {
+                "daily_average": 8500,
+                "peak_hour": 1500
+            },
+            "condition": "fair",
+            "condition_score": 2,
+            "last_inspection_date": "2023-12-20T00:00:00.000Z",
+            "next_inspection_date": "2024-06-20T00:00:00.000Z",
+            "status": "operational",
+            "criticality_level": "medium",
+            "estimated_value": 3200000,
+            "annual_maintenance_cost": 180000,
+            "data_source": "gis",
+            "verified": false,
+            "notes": "Frequently flooded area, requires elevation improvements"
+        }
+    ],
+    "risk_index_data": [{
+            "ward_id": "507f1f77bcf86cd799439011",
+            "date": "2024-01-08T00:00:00.000Z",
+            "risk_index": 6.2,
+            "exposure": 7.8,
+            "susceptibility": 6.5,
+            "resilience": 4.2,
+            "exposure_components": {
+                "population_density": {
+                    "value": 15000,
+                    "weight": 0.3,
+                    "contribution": 7.5
+                },
+                "urban_land_use": {
+                    "value": 85,
+                    "weight": 0.25,
+                    "contribution": 8.2
+                },
+                "elevation": {
+                    "value": 2.5,
+                    "weight": 0.25,
+                    "contribution": 6.8
+                },
+                "proximity_to_water": {
+                    "value": 150,
+                    "weight": 0.2,
+                    "contribution": 8.9
+                }
+            },
+            "susceptibility_components": {
+                "rainfall_intensity": {
+                    "value": 1800,
+                    "weight": 0.4,
+                    "contribution": 7.2
+                },
+                "soil_type": {
+                    "value": "clay",
+                    "permeability": 0.15,
+                    "weight": 0.2,
+                    "contribution": 6.8
+                },
+                "slope": {
+                    "value": 1.2,
+                    "weight": 0.2,
+                    "contribution": 5.6
+                },
+                "drainage_capacity": {
+                    "value": 6.5,
+                    "weight": 0.2,
+                    "contribution": 6.1
+                }
+            },
+            "resilience_components": {
+                "drainage_systems": {
+                    "count": 8,
+                    "efficiency": 86.7,
+                    "weight": 0.3,
+                    "contribution": 4.8
+                },
+                "infrastructure": {
+                    "flood_defenses": 3,
+                    "elevated_structures": 2,
+                    "weight": 0.25,
+                    "contribution": 3.9
+                },
+                "emergency_services": {
+                    "response_time": 8,
+                    "capacity": 75,
+                    "weight": 0.25,
+                    "contribution": 4.1
+                },
+                "community_preparedness": {
+                    "score": 68,
+                    "weight": 0.2,
+                    "contribution": 3.8
+                }
+            },
+            "risk_category": "High",
+            "risk_trend": "increasing",
+            "compared_to_previous": {
+                "period": "week",
+                "change_percentage": 12.5,
+                "change_amount": 0.7
+            },
+            "external_factors": {
+                "weather_warnings": [{
+                    "type": "heavy_rain",
+                    "severity": "high",
+                    "expected_impact": 7.8
+                }],
+                "upstream_conditions": {
+                    "dam_release": false,
+                    "upstream_rainfall": 95
+                }
+            },
+            "confidence_level": 92,
+            "data_completeness": 98,
+            "calculation_method": "automated",
+            "calculation_version": "1.0",
+            "input_data_sources": [{
+                    "name": "Weather Station A",
+                    "type": "weather",
+                    "reliability": 95
+                },
+                {
+                    "name": "Drainage Survey 2024",
+                    "type": "survey",
+                    "reliability": 88
+                }
+            ],
+            "validated": true,
+            "validated_by": "507f1f77bcf86cd799439012",
+            "validated_date": "2024-01-08T08:00:00.000Z",
+            "notes": "High risk due to recent heavy rainfall and low elevation areas"
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439012",
+            "date": "2024-01-08T00:00:00.000Z",
+            "risk_index": 4.8,
+            "exposure": 6.2,
+            "susceptibility": 5.1,
+            "resilience": 5.8,
+            "exposure_components": {
+                "population_density": {
+                    "value": 12000,
+                    "weight": 0.3,
+                    "contribution": 6.1
+                },
+                "urban_land_use": {
+                    "value": 78,
+                    "weight": 0.25,
+                    "contribution": 6.8
+                },
+                "elevation": {
+                    "value": 1.8,
+                    "weight": 0.25,
+                    "contribution": 7.2
+                },
+                "proximity_to_water": {
+                    "value": 200,
+                    "weight": 0.2,
+                    "contribution": 5.9
+                }
+            },
+            "susceptibility_components": {
+                "rainfall_intensity": {
+                    "value": 1750,
+                    "weight": 0.4,
+                    "contribution": 5.8
+                },
+                "soil_type": {
+                    "value": "silt",
+                    "permeability": 0.25,
+                    "weight": 0.2,
+                    "contribution": 4.9
+                },
+                "slope": {
+                    "value": 0.8,
+                    "weight": 0.2,
+                    "contribution": 4.2
+                },
+                "drainage_capacity": {
+                    "value": 7.2,
+                    "weight": 0.2,
+                    "contribution": 5.5
+                }
+            },
+            "resilience_components": {
+                "drainage_systems": {
+                    "count": 6,
+                    "efficiency": 89.9,
+                    "weight": 0.3,
+                    "contribution": 6.2
+                },
+                "infrastructure": {
+                    "flood_defenses": 2,
+                    "elevated_structures": 1,
+                    "weight": 0.25,
+                    "contribution": 5.6
+                },
+                "emergency_services": {
+                    "response_time": 6,
+                    "capacity": 82,
+                    "weight": 0.25,
+                    "contribution": 6.1
+                },
+                "community_preparedness": {
+                    "score": 75,
+                    "weight": 0.2,
+                    "contribution": 4.9
+                }
+            },
+            "risk_category": "Medium",
+            "risk_trend": "stable",
+            "compared_to_previous": {
+                "period": "week",
+                "change_percentage": 2.1,
+                "change_amount": 0.1
+            },
+            "external_factors": {
+                "weather_warnings": [],
+                "upstream_conditions": {
+                    "dam_release": false,
+                    "upstream_rainfall": 65
+                }
+            },
+            "confidence_level": 95,
+            "data_completeness": 100,
+            "calculation_method": "automated",
+            "calculation_version": "1.0",
+            "input_data_sources": [{
+                    "name": "Weather Station B",
+                    "type": "weather",
+                    "reliability": 98
+                },
+                {
+                    "name": "Infrastructure Survey 2023",
+                    "type": "survey",
+                    "reliability": 92
+                }
+            ],
+            "validated": true,
+            "validated_by": "507f1f77bcf86cd799439012",
+            "validated_date": "2024-01-08T08:15:00.000Z",
+            "notes": "Moderate risk with good drainage infrastructure"
+        },
+        {
+            "ward_id": "507f1f77bcf86cd799439013",
+            "date": "2024-01-08T00:00:00.000Z",
+            "risk_index": 7.8,
+            "exposure": 8.9,
+            "susceptibility": 7.2,
+            "resilience": 3.1,
+            "exposure_components": {
+                "population_density": {
+                    "value": 18000,
+                    "weight": 0.3,
+                    "contribution": 8.8
+                },
+                "urban_land_use": {
+                    "value": 92,
+                    "weight": 0.25,
+                    "contribution": 9.2
+                },
+                "elevation": {
+                    "value": 1.2,
+                    "weight": 0.25,
+                    "contribution": 8.5
+                },
+                "proximity_to_water": {
+                    "value": 80,
+                    "weight": 0.2,
+                    "contribution": 9.8
+                }
+            },
+            "susceptibility_components": {
+                "rainfall_intensity": {
+                    "value": 1900,
+                    "weight": 0.4,
+                    "contribution": 8.1
+                },
+                "soil_type": {
+                    "value": "clay",
+                    "permeability": 0.12,
+                    "weight": 0.2,
+                    "contribution": 7.8
+                },
+                "slope": {
+                    "value": 0.5,
+                    "weight": 0.2,
+                    "contribution": 5.9
+                },
+                "drainage_capacity": {
+                    "value": 5.8,
+                    "weight": 0.2,
+                    "contribution": 6.8
+                }
+            },
+            "resilience_components": {
+                "drainage_systems": {
+                    "count": 10,
+                    "efficiency": 69.7,
+                    "weight": 0.3,
+                    "contribution": 3.8
+                },
+                "infrastructure": {
+                    "flood_defenses": 1,
+                    "elevated_structures": 0,
+                    "weight": 0.25,
+                    "contribution": 2.9
+                },
+                "emergency_services": {
+                    "response_time": 12,
+                    "capacity": 65,
+                    "weight": 0.25,
+                    "contribution": 2.8
+                },
+                "community_preparedness": {
+                    "score": 58,
+                    "weight": 0.2,
+                    "contribution": 2.5
+                }
+            },
+            "risk_category": "Very High",
+            "risk_trend": "increasing",
+            "compared_to_previous": {
+                "period": "week",
+                "change_percentage": 18.9,
+                "change_amount": 1.2
+            },
+            "external_factors": {
+                "weather_warnings": [{
+                    "type": "flood",
+                    "severity": "extreme",
+                    "expected_impact": 9.5
+                }],
+                "upstream_conditions": {
+                    "dam_release": true,
+                    "upstream_rainfall": 180
+                }
+            },
+            "confidence_level": 88,
+            "data_completeness": 95,
+            "calculation_method": "automated",
+            "calculation_version": "1.0",
+            "input_data_sources": [{
+                    "name": "Weather Station C",
+                    "type": "weather",
+                    "reliability": 92
+                },
+                {
+                    "name": "Emergency Monitoring",
+                    "type": "sensor",
+                    "reliability": 85
+                }
+            ],
+            "validated": false,
+            "notes": "Critical flood risk - immediate attention required"
+        }
+    ],
+    "settings": [{
+        "user_id": "507f1f77bcf86cd799439011",
+        "theme": "dark",
+        "language": "vi",
+        "dashboard": {
+            "defaultView": "dashboard",
+            "refreshInterval": 300,
+            "showNotifications": true
+        },
+        "riskThresholds": {
+            "veryLow": 2,
+            "low": 4,
+            "medium": 6,
+            "high": 8,
+            "veryHigh": 9
+        },
+        "notifications": {
+            "email": {
+                "enabled": true,
+                "types": {
+                    "floodAlerts": true,
+                    "systemUpdates": true,
+                    "reportReady": true,
+                    "maintenanceDue": true
+                }
+            },
+            "browser": {
+                "enabled": true,
+                "types": {
+                    "floodAlerts": true,
+                    "systemUpdates": false,
+                    "reportReady": true,
+                    "maintenanceDue": true
+                }
+            },
+            "sms": {
+                "enabled": false,
+                "types": {
+                    "floodAlerts": true,
+                    "systemUpdates": false,
+                    "reportReady": false,
+                    "maintenanceDue": false
+                }
+            }
+        },
+        "privacy": {
+            "shareAnalytics": false,
+            "allowDataCollection": true,
+            "publicProfile": false
+        },
+        "accessibility": {
+            "fontSize": "medium",
+            "highContrast": false,
+            "reduceMotion": false
+        }
+    }]
+}
