@@ -275,6 +275,90 @@ const getInspectionNeeded = async(req, res) => {
     }
 };
 
+// @desc    Bulk import road bridge data
+// @route   POST /api/road-bridge/bulk-import
+// @access  Private/Admin
+const bulkImportRoadBridge = async(req, res) => {
+    try {
+        const { roadBridgeData } = req.body;
+
+        if (!Array.isArray(roadBridgeData) || roadBridgeData.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Road bridge data array is required and cannot be empty'
+            });
+        }
+
+        const results = {
+            successful: [],
+            failed: [],
+            duplicates: []
+        };
+
+        for (const data of roadBridgeData) {
+            try {
+                // Check for duplicates by structure_id
+                const existingStructure = await RoadBridgeData.findOne({ structure_id: data.structure_id });
+                if (existingStructure) {
+                    results.duplicates.push({
+                        structure_id: data.structure_id,
+                        reason: 'Structure ID already exists'
+                    });
+                    continue;
+                }
+
+                // Find ward by ward_code
+                const ward = await Ward.findOne({ ward_code: data.ward_code });
+                if (!ward) {
+                    results.failed.push({
+                        structure_id: data.structure_id || 'Unknown',
+                        error: `Ward with code ${data.ward_code} not found`
+                    });
+                    continue;
+                }
+
+                // Create road bridge data
+                const structure = await RoadBridgeData.create({
+                    structure_id: data.structure_id,
+                    ward_id: ward._id,
+                    structure_type: data.structure_type || 'Road',
+                    name: data.name,
+                    length: data.length || 0,
+                    width: data.width || 0,
+                    height: data.height || 0,
+                    material: data.material || 'Asphalt',
+                    coordinates: data.coordinates ? JSON.parse(data.coordinates) : [],
+                    status: data.status || 'Good',
+                    last_inspection: data.last_inspection || null,
+                    description: data.description || ''
+                });
+
+                results.successful.push({
+                    id: structure._id,
+                    structure_id: structure.structure_id
+                });
+            } catch (error) {
+                results.failed.push({
+                    structure_id: data.structure_id || 'Unknown',
+                    error: error.message
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Bulk import completed. ${results.successful.length} successful, ${results.failed.length} failed, ${results.duplicates.length} duplicates`,
+            results
+        });
+    } catch (error) {
+        console.error('Bulk import road bridge error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Server error during bulk import'
+        });
+    }
+};
+
 module.exports = {
     getRoadBridgeData,
     getRoadBridgeById,
@@ -283,5 +367,6 @@ module.exports = {
     deleteRoadBridgeData,
     getRoadBridgeByWard,
     getHighRiskInfrastructure,
-    getInspectionNeeded
+    getInspectionNeeded,
+    bulkImportRoadBridge
 };

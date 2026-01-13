@@ -315,6 +315,88 @@ const getMaintenanceNeeded = async(req, res) => {
     }
 };
 
+// @desc    Bulk import drainage data
+// @route   POST /api/drainage/bulk-import
+// @access  Private/Admin
+const bulkImportDrainage = async(req, res) => {
+    try {
+        const { drainageData } = req.body;
+
+        if (!Array.isArray(drainageData) || drainageData.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Drainage data array is required and cannot be empty'
+            });
+        }
+
+        const results = {
+            successful: [],
+            failed: [],
+            duplicates: []
+        };
+
+        for (const data of drainageData) {
+            try {
+                // Check for duplicates by drainage_id
+                const existingDrainage = await DrainageData.findOne({ drainage_id: data.drainage_id });
+                if (existingDrainage) {
+                    results.duplicates.push({
+                        drainage_id: data.drainage_id,
+                        reason: 'Drainage ID already exists'
+                    });
+                    continue;
+                }
+
+                // Find ward by ward_code
+                const ward = await Ward.findOne({ ward_code: data.ward_code });
+                if (!ward) {
+                    results.failed.push({
+                        drainage_id: data.drainage_id || 'Unknown',
+                        error: `Ward with code ${data.ward_code} not found`
+                    });
+                    continue;
+                }
+
+                // Create drainage data
+                const drainage = await DrainageData.create({
+                    drainage_id: data.drainage_id,
+                    ward_id: ward._id,
+                    drainage_type: data.drainage_type || 'Main Drain',
+                    length: data.length || 0,
+                    diameter: data.diameter || 0,
+                    material: data.material || 'Concrete',
+                    coordinates: data.coordinates ? JSON.parse(data.coordinates) : [],
+                    status: data.status || 'Active',
+                    last_maintenance: data.last_maintenance || null,
+                    description: data.description || ''
+                });
+
+                results.successful.push({
+                    id: drainage._id,
+                    drainage_id: drainage.drainage_id
+                });
+            } catch (error) {
+                results.failed.push({
+                    drainage_id: data.drainage_id || 'Unknown',
+                    error: error.message
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Bulk import completed. ${results.successful.length} successful, ${results.failed.length} failed, ${results.duplicates.length} duplicates`,
+            results
+        });
+    } catch (error) {
+        console.error('Bulk import drainage error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Server error during bulk import'
+        });
+    }
+};
+
 module.exports = {
     getDrainageData,
     getDrainageById,
@@ -323,5 +405,6 @@ module.exports = {
     deleteDrainageData,
     getDrainageByWard,
     getDrainageStats,
-    getMaintenanceNeeded
+    getMaintenanceNeeded,
+    bulkImportDrainage
 };

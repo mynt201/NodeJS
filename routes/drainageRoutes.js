@@ -7,7 +7,8 @@ const {
   deleteDrainageData,
   getDrainageByWard,
   getDrainageStats,
-  getMaintenanceNeeded
+  getMaintenanceNeeded,
+  bulkImportDrainage
 } = require('../controllers/drainageController');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -27,6 +28,7 @@ router.use(protect);
 router.use(authorize('admin'));
 
 router.post('/', createDrainageData);
+router.post('/bulk-import', bulkImportDrainage);
 router.put('/:id', idValidation, updateDrainageData);
 router.delete('/:id', idValidation, deleteDrainageData);
 

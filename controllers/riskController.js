@@ -337,6 +337,94 @@ const getRiskTrend = async(req, res) => {
     }
 };
 
+// @desc    Bulk import risk index data
+// @route   POST /api/risk/bulk-import
+// @access  Private/Admin
+const bulkImportRisk = async(req, res) => {
+    try {
+        const { riskData } = req.body;
+
+        if (!Array.isArray(riskData) || riskData.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Risk data array is required and cannot be empty'
+            });
+        }
+
+        const results = {
+            successful: [],
+            failed: [],
+            duplicates: []
+        };
+
+        for (const data of riskData) {
+            try {
+                // Check for duplicates by ward_code and date
+                const existingRisk = await RiskIndexData.findOne({
+                    ward_code: data.ward_code,
+                    date: new Date(data.date)
+                });
+                if (existingRisk) {
+                    results.duplicates.push({
+                        ward_code: data.ward_code,
+                        date: data.date,
+                        reason: 'Risk data for this ward and date already exists'
+                    });
+                    continue;
+                }
+
+                // Find ward by ward_code
+                const ward = await Ward.findOne({ ward_code: data.ward_code });
+                if (!ward) {
+                    results.failed.push({
+                        ward_code: data.ward_code,
+                        error: `Ward with code ${data.ward_code} not found`
+                    });
+                    continue;
+                }
+
+                // Create risk index data
+                const riskRecord = await RiskIndexData.create({
+                    ward_id: ward._id,
+                    ward_code: data.ward_code,
+                    date: new Date(data.date),
+                    rainfall_risk: data.rainfall_risk || 'Low',
+                    drainage_risk: data.drainage_risk || 'Low',
+                    flood_history_risk: data.flood_history_risk || 'Low',
+                    topography_risk: data.topography_risk || 'Low',
+                    population_density_risk: data.population_density_risk || 'Low',
+                    overall_risk: data.overall_risk || 'Low',
+                    description: data.description || ''
+                });
+
+                results.successful.push({
+                    id: riskRecord._id,
+                    ward_code: riskRecord.ward_code,
+                    date: riskRecord.date
+                });
+            } catch (error) {
+                results.failed.push({
+                    ward_code: data.ward_code || 'Unknown',
+                    date: data.date || 'Unknown',
+                    error: error.message
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Bulk import completed. ${results.successful.length} successful, ${results.failed.length} failed, ${results.duplicates.length} duplicates`,
+            results
+        });
+    } catch (error) {
+        console.error('Bulk import risk error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Server error during bulk import'
+        });
+    }
+};
+
 module.exports = {
     getRiskIndexData,
     getRiskById,
@@ -346,5 +434,6 @@ module.exports = {
     getRiskHistoryByWard,
     getCurrentRiskLevels,
     recalculateRisk,
-    getRiskTrend
+    getRiskTrend,
+    bulkImportRisk
 };

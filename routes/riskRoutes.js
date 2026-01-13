@@ -8,7 +8,8 @@ const {
   getRiskHistoryByWard,
   getCurrentRiskLevels,
   recalculateRisk,
-  getRiskTrend
+  getRiskTrend,
+  bulkImportRisk
 } = require('../controllers/riskController');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -28,6 +29,7 @@ router.use(protect);
 router.use(authorize('admin'));
 
 router.post('/', createRiskIndexData);
+router.post('/bulk-import', bulkImportRisk);
 router.put('/:id', idValidation, updateRiskIndexData);
 router.delete('/:id', idValidation, deleteRiskIndexData);
 router.post('/:id/recalculate', idValidation, recalculateRisk);

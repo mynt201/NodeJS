@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   register,
+  createAdminUser,
   login,
   getProfile,
   updateProfile,
@@ -30,6 +31,7 @@ router.put('/profile', userValidation.updateProfile, updateProfile);
 router.put('/change-password', changePassword);
 
 // Admin only routes
+router.post('/create-admin', authorize('admin'), userValidation.register, createAdminUser);
 router.get('/', authorize('admin'), queryValidation.pagination, getUsers);
 router.get('/stats', authorize('admin'), getUserStats);
 router.get('/:id', authorize('admin'), idValidation, getUserById);

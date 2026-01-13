@@ -7,7 +7,8 @@ const {
   deleteRoadBridgeData,
   getRoadBridgeByWard,
   getHighRiskInfrastructure,
-  getInspectionNeeded
+  getInspectionNeeded,
+  bulkImportRoadBridge
 } = require('../controllers/roadBridgeController');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -27,6 +28,7 @@ router.use(protect);
 router.use(authorize('admin'));
 
 router.post('/', createRoadBridgeData);
+router.post('/bulk-import', bulkImportRoadBridge);
 router.put('/:id', idValidation, updateRoadBridgeData);
 router.delete('/:id', idValidation, deleteRoadBridgeData);
 
