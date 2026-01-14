@@ -5,7 +5,7 @@ const { generateToken } = require("../middleware/auth");
 // @desc    Register user
 // @route   POST /api/users/register
 // @access  Public
-const register = async(req, res) => {
+const register = async (req, res) => {
     try {
         const { username, email, password, fullName, phone, address } = req.body;
 
@@ -70,7 +70,7 @@ const register = async(req, res) => {
 // @desc    Login user
 // @route   POST /api/users/login
 // @access  Public
-const login = async(req, res) => {
+const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -147,7 +147,7 @@ const login = async(req, res) => {
 // @desc    Get current user profile
 // @route   GET /api/users/profile
 // @access  Private
-const getProfile = async(req, res) => {
+const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
 
@@ -180,7 +180,7 @@ const getProfile = async(req, res) => {
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
-const updateProfile = async(req, res) => {
+const updateProfile = async (req, res) => {
     try {
         const { fullName, phone, address, email } = req.body;
 
@@ -238,7 +238,7 @@ const updateProfile = async(req, res) => {
 // @desc    Change password
 // @route   PUT /api/users/change-password
 // @access  Private
-const changePassword = async(req, res) => {
+const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
 
@@ -301,7 +301,7 @@ const changePassword = async(req, res) => {
 // @desc    Get all users (Admin only)
 // @route   GET /api/users
 // @access  Private/Admin
-const getUsers = async(req, res) => {
+const getUsers = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = Math.min(parseInt(req.query.limit) || 10, 100); // Max 100 items per page
@@ -484,7 +484,7 @@ const getUsers = async(req, res) => {
 // @desc    Get user by ID (Admin only)
 // @route   GET /api/users/:id
 // @access  Private/Admin
-const getUserById = async(req, res) => {
+const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select("-password");
 
@@ -511,7 +511,7 @@ const getUserById = async(req, res) => {
 // @desc    Update user (Admin only)
 // @route   PUT /api/users/:id
 // @access  Private/Admin
-const updateUser = async(req, res) => {
+const updateUser = async (req, res) => {
     try {
         const { role, isActive, fullName, phone, address } = req.body;
 
@@ -551,7 +551,7 @@ const updateUser = async(req, res) => {
 // @desc    Delete user (Admin only)
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
-const deleteUser = async(req, res) => {
+const deleteUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
 
@@ -588,7 +588,7 @@ const deleteUser = async(req, res) => {
 // @desc    Get user statistics (Admin only)
 // @route   GET /api/users/stats
 // @access  Private/Admin
-const getUserStats = async(req, res) => {
+const getUserStats = async (req, res) => {
     try {
         const stats = await User.aggregate([{
             $group: {
@@ -604,8 +604,8 @@ const getUserStats = async(req, res) => {
                 adminUsers: {
                     $sum: {
                         $cond: [{
-                                $eq: ["$role", "admin"],
-                            },
+                            $eq: ["$role", "admin"],
+                        },
                             1,
                             0,
                         ],
@@ -614,18 +614,18 @@ const getUserStats = async(req, res) => {
                 recentUsers: {
                     $sum: {
                         $cond: [{
-                                $gte: [
-                                    "$createdAt",
-                                    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-                                ],
-                            },
+                            $gte: [
+                                "$createdAt",
+                                new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                            ],
+                        },
                             1,
                             0,
                         ],
                     },
                 },
             },
-        }, ]);
+        },]);
 
         res.json({
             success: true,
@@ -648,7 +648,7 @@ const getUserStats = async(req, res) => {
 // @desc    Create admin user (Admin only)
 // @route   POST /api/users/create-admin
 // @access  Private/Admin
-const createAdminUser = async(req, res) => {
+const createAdminUser = async (req, res) => {
     try {
         const { username, email, password, fullName, phone, address } = req.body;
 

@@ -4,7 +4,7 @@ const Ward = require('../models/Ward');
 // @desc    Get drainage data
 // @route   GET /api/drainage
 // @access  Public
-const getDrainageData = async(req, res) => {
+const getDrainageData = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -45,7 +45,7 @@ const getDrainageData = async(req, res) => {
 // @desc    Get drainage by ID
 // @route   GET /api/drainage/:id
 // @access  Public
-const getDrainageById = async(req, res) => {
+const getDrainageById = async (req, res) => {
     try {
         const drainage = await DrainageData.findById(req.params.id)
             .populate('ward_id', 'ward_name district coordinates');
@@ -73,9 +73,9 @@ const getDrainageById = async(req, res) => {
 // @desc    Create drainage data
 // @route   POST /api/drainage
 // @access  Private/Admin
-const createDrainageData = async(req, res) => {
+const createDrainageData = async (req, res) => {
     try {
-        const drainageData = {...req.body };
+        const drainageData = { ...req.body };
 
         const ward = await Ward.findById(drainageData.ward_id);
         if (!ward) {
@@ -114,9 +114,9 @@ const createDrainageData = async(req, res) => {
 // @desc    Update drainage data
 // @route   PUT /api/drainage/:id
 // @access  Private/Admin
-const updateDrainageData = async(req, res) => {
+const updateDrainageData = async (req, res) => {
     try {
-        const updateData = {...req.body };
+        const updateData = { ...req.body };
 
         const existingDrainage = await DrainageData.findById(req.params.id);
         if (!existingDrainage) {
@@ -168,7 +168,7 @@ const updateDrainageData = async(req, res) => {
 // @desc    Delete drainage data
 // @route   DELETE /api/drainage/:id
 // @access  Private/Admin
-const deleteDrainageData = async(req, res) => {
+const deleteDrainageData = async (req, res) => {
     try {
         const drainage = await DrainageData.findById(req.params.id);
 
@@ -197,7 +197,7 @@ const deleteDrainageData = async(req, res) => {
 // @desc    Get drainage data by ward
 // @route   GET /api/drainage/ward/:wardId
 // @access  Public
-const getDrainageByWard = async(req, res) => {
+const getDrainageByWard = async (req, res) => {
     try {
         const ward = await Ward.findById(req.params.wardId);
         if (!ward) {
@@ -234,7 +234,7 @@ const getDrainageByWard = async(req, res) => {
 // @desc    Get drainage statistics
 // @route   GET /api/drainage/stats
 // @access  Public
-const getDrainageStats = async(req, res) => {
+const getDrainageStats = async (req, res) => {
     try {
         const stats = await DrainageData.aggregate([
             { $match: { status: 'operational' } },
@@ -296,7 +296,7 @@ const getDrainageStats = async(req, res) => {
 // @desc    Get systems needing maintenance
 // @route   GET /api/drainage/maintenance-needed
 // @access  Public
-const getMaintenanceNeeded = async(req, res) => {
+const getMaintenanceNeeded = async (req, res) => {
     try {
         const systems = await DrainageData.getNeedingMaintenance()
             .populate('ward_id', 'ward_name district');
@@ -318,7 +318,7 @@ const getMaintenanceNeeded = async(req, res) => {
 // @desc    Bulk import drainage data
 // @route   POST /api/drainage/bulk-import
 // @access  Private/Admin
-const bulkImportDrainage = async(req, res) => {
+const bulkImportDrainage = async (req, res) => {
     try {
         const { drainageData } = req.body;
 

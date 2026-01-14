@@ -3,7 +3,7 @@ const Ward = require('../models/Ward');
 // @desc    Get all wards
 // @route   GET /api/wards
 // @access  Public
-const getWards = async(req, res) => {
+const getWards = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -51,7 +51,7 @@ const getWards = async(req, res) => {
 // @desc    Get ward by ID
 // @route   GET /api/wards/:id
 // @access  Public
-const getWardById = async(req, res) => {
+const getWardById = async (req, res) => {
     try {
         const ward = await Ward.findById(req.params.id);
 
@@ -78,7 +78,7 @@ const getWardById = async(req, res) => {
 // @desc    Get ward by name
 // @route   GET /api/wards/name/:name
 // @access  Public
-const getWardByName = async(req, res) => {
+const getWardByName = async (req, res) => {
     try {
         const ward = await Ward.findOne({
             ward_name: req.params.name,
@@ -108,9 +108,9 @@ const getWardByName = async(req, res) => {
 // @desc    Create new ward
 // @route   POST /api/wards
 // @access  Private/Admin
-const createWard = async(req, res) => {
+const createWard = async (req, res) => {
     try {
-        const wardData = {...req.body };
+        const wardData = { ...req.body };
 
         // Check if ward name already exists
         const existingWard = await Ward.findOne({ ward_name: wardData.ward_name });
@@ -158,9 +158,9 @@ const createWard = async(req, res) => {
 // @desc    Update ward
 // @route   PUT /api/wards/:id
 // @access  Private/Admin
-const updateWard = async(req, res) => {
+const updateWard = async (req, res) => {
     try {
-        const updateData = {...req.body };
+        const updateData = { ...req.body };
 
         // Check if ward exists
         const existingWard = await Ward.findById(req.params.id);
@@ -235,7 +235,7 @@ const updateWard = async(req, res) => {
 // @desc    Delete ward
 // @route   DELETE /api/wards/:id
 // @access  Private/Admin
-const deleteWard = async(req, res) => {
+const deleteWard = async (req, res) => {
     try {
         const ward = await Ward.findById(req.params.id);
 
@@ -266,7 +266,7 @@ const deleteWard = async(req, res) => {
 // @desc    Calculate flood risk for a ward
 // @route   POST /api/wards/:id/calculate-risk
 // @access  Private/Admin
-const calculateRisk = async(req, res) => {
+const calculateRisk = async (req, res) => {
     try {
         const ward = await Ward.findById(req.params.id);
 
@@ -308,7 +308,7 @@ const calculateRisk = async(req, res) => {
 // @desc    Get wards by risk level
 // @route   GET /api/wards/risk/:level
 // @access  Public
-const getWardsByRiskLevel = async(req, res) => {
+const getWardsByRiskLevel = async (req, res) => {
     try {
         const { level } = req.params;
         const validLevels = ['Very Low', 'Low', 'Medium', 'High', 'Very High'];
@@ -342,7 +342,7 @@ const getWardsByRiskLevel = async(req, res) => {
 // @desc    Get ward statistics
 // @route   GET /api/wards/stats
 // @access  Public
-const getWardStats = async(req, res) => {
+const getWardStats = async (req, res) => {
     try {
         const stats = await Ward.getStatistics();
 
@@ -397,7 +397,7 @@ const getWardStats = async(req, res) => {
 // @desc    Bulk import wards
 // @route   POST /api/wards/bulk-import
 // @access  Private/Admin
-const bulkImportWards = async(req, res) => {
+const bulkImportWards = async (req, res) => {
     try {
         const { wards } = req.body;
 

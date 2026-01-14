@@ -28,7 +28,7 @@ app.use('/api/risk', riskRoutes);
 app.use('/api/road-bridge', roadBridgeRoutes);
 
 // Connect to database and seed if needed
-const initializeApp = async() => {
+const initializeApp = async () => {
     try {
         await connectDB();
 
@@ -89,7 +89,7 @@ app.use((req, res) => {
 });
 
 // Initialize app first, then start server
-const startServer = async() => {
+const startServer = async () => {
     try {
         // Initialize database first
         await initializeApp();

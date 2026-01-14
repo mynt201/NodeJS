@@ -3,7 +3,7 @@ const Settings = require('../models/Settings');
 // @desc    Get user settings
 // @route   GET /api/settings
 // @access  Private
-const getSettings = async(req, res) => {
+const getSettings = async (req, res) => {
     try {
         let settings = await Settings.findOne({ user_id: req.user._id });
 
@@ -28,9 +28,9 @@ const getSettings = async(req, res) => {
 // @desc    Update user settings
 // @route   PUT /api/settings
 // @access  Private
-const updateSettings = async(req, res) => {
+const updateSettings = async (req, res) => {
     try {
-        const updateData = {...req.body };
+        const updateData = { ...req.body };
 
         // Validate risk thresholds
         if (updateData.riskThresholds) {
@@ -88,7 +88,7 @@ const updateSettings = async(req, res) => {
 // @desc    Reset settings to defaults
 // @route   POST /api/settings/reset
 // @access  Private
-const resetSettings = async(req, res) => {
+const resetSettings = async (req, res) => {
     try {
         let settings = await Settings.findOne({ user_id: req.user._id });
 
@@ -116,7 +116,7 @@ const resetSettings = async(req, res) => {
 // @desc    Update notification settings
 // @route   PUT /api/settings/notifications
 // @access  Private
-const updateNotifications = async(req, res) => {
+const updateNotifications = async (req, res) => {
     try {
         const { type, settings: notificationSettings } = req.body;
 
@@ -160,7 +160,7 @@ const updateNotifications = async(req, res) => {
 // @desc    Get system-wide settings statistics (Admin only)
 // @route   GET /api/settings/stats
 // @access  Private/Admin
-const getSystemStats = async(req, res) => {
+const getSystemStats = async (req, res) => {
     try {
         const stats = await Settings.getSystemStats();
 
@@ -186,7 +186,7 @@ const getSystemStats = async(req, res) => {
 // @desc    Get default settings template
 // @route   GET /api/settings/defaults
 // @access  Public
-const getDefaults = async(req, res) => {
+const getDefaults = async (req, res) => {
     try {
         // Create a temporary settings object to get default values
         const defaultSettings = new Settings();

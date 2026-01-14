@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
-const seedAdmin = async() => {
+const seedAdmin = async () => {
     try {
         console.log('🌱 Checking for existing admin user...');
 
@@ -52,7 +52,7 @@ const seedAdmin = async() => {
     }
 };
 
-const seedDatabase = async() => {
+const seedDatabase = async () => {
     try {
         console.log('🌱 Starting database seeding...');
 

@@ -9,7 +9,7 @@ const generateToken = (userId) => {
 };
 
 // Protect routes - require authentication
-const protect = async(req, res, next) => {
+const protect = async (req, res, next) => {
     try {
         let token;
 
@@ -85,7 +85,7 @@ const authorize = (...roles) => {
 };
 
 // Optional authentication - doesn't fail if no token
-const optionalAuth = async(req, res, next) => {
+const optionalAuth = async (req, res, next) => {
     try {
         let token;
 

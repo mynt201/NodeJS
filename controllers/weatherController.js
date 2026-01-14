@@ -4,7 +4,7 @@ const Ward = require('../models/Ward');
 // @desc    Get weather data
 // @route   GET /api/weather
 // @access  Public
-const getWeatherData = async(req, res) => {
+const getWeatherData = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 50;
@@ -56,7 +56,7 @@ const getWeatherData = async(req, res) => {
 // @desc    Get weather data by ID
 // @route   GET /api/weather/:id
 // @access  Public
-const getWeatherById = async(req, res) => {
+const getWeatherById = async (req, res) => {
     try {
         const weather = await WeatherData.findById(req.params.id)
             .populate('ward_id', 'ward_name district coordinates');
@@ -84,9 +84,9 @@ const getWeatherById = async(req, res) => {
 // @desc    Create weather data
 // @route   POST /api/weather
 // @access  Private/Admin
-const createWeatherData = async(req, res) => {
+const createWeatherData = async (req, res) => {
     try {
-        const weatherData = {...req.body };
+        const weatherData = { ...req.body };
 
         // Check if ward exists
         const ward = await Ward.findById(weatherData.ward_id);
@@ -136,9 +136,9 @@ const createWeatherData = async(req, res) => {
 // @desc    Update weather data
 // @route   PUT /api/weather/:id
 // @access  Private/Admin
-const updateWeatherData = async(req, res) => {
+const updateWeatherData = async (req, res) => {
     try {
-        const updateData = {...req.body };
+        const updateData = { ...req.body };
 
         // Check if weather data exists
         const existingWeather = await WeatherData.findById(req.params.id);
@@ -193,7 +193,7 @@ const updateWeatherData = async(req, res) => {
 // @desc    Delete weather data
 // @route   DELETE /api/weather/:id
 // @access  Private/Admin
-const deleteWeatherData = async(req, res) => {
+const deleteWeatherData = async (req, res) => {
     try {
         const weather = await WeatherData.findById(req.params.id);
 
@@ -222,7 +222,7 @@ const deleteWeatherData = async(req, res) => {
 // @desc    Get weather data for a specific ward
 // @route   GET /api/weather/ward/:wardId
 // @access  Public
-const getWeatherByWard = async(req, res) => {
+const getWeatherByWard = async (req, res) => {
     try {
         const { wardId } = req.params;
         const page = parseInt(req.query.page) || 1;
@@ -279,7 +279,7 @@ const getWeatherByWard = async(req, res) => {
 // @desc    Get latest weather data for all wards
 // @route   GET /api/weather/latest
 // @access  Public
-const getLatestWeather = async(req, res) => {
+const getLatestWeather = async (req, res) => {
     try {
         const latestWeather = await WeatherData.getLatestForAllWards();
 
@@ -300,7 +300,7 @@ const getLatestWeather = async(req, res) => {
 // @desc    Get weather statistics for a ward
 // @route   GET /api/weather/stats/:wardId
 // @access  Public
-const getWeatherStats = async(req, res) => {
+const getWeatherStats = async (req, res) => {
     try {
         const { wardId } = req.params;
         const days = parseInt(req.query.days) || 30;
@@ -318,27 +318,27 @@ const getWeatherStats = async(req, res) => {
         }
 
         const stats = await WeatherData.aggregate([{
-                $match: {
-                    ward_id: require('mongoose').Types.ObjectId(wardId),
-                    date: { $gte: startDate }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    count: { $sum: 1 },
-                    avgTemperature: { $avg: '$temperature.current' },
-                    maxTemperature: { $max: '$temperature.max' },
-                    minTemperature: { $min: '$temperature.min' },
-                    avgHumidity: { $avg: '$humidity' },
-                    totalRainfall: { $sum: '$rainfall' },
-                    avgRainfall: { $avg: '$rainfall' },
-                    maxRainfall: { $max: '$rainfall' },
-                    rainyDays: {
-                        $sum: { $cond: [{ $gt: ['$rainfall', 0] }, 1, 0] }
-                    }
+            $match: {
+                ward_id: require('mongoose').Types.ObjectId(wardId),
+                date: { $gte: startDate }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                count: { $sum: 1 },
+                avgTemperature: { $avg: '$temperature.current' },
+                maxTemperature: { $max: '$temperature.max' },
+                minTemperature: { $min: '$temperature.min' },
+                avgHumidity: { $avg: '$humidity' },
+                totalRainfall: { $sum: '$rainfall' },
+                avgRainfall: { $avg: '$rainfall' },
+                maxRainfall: { $max: '$rainfall' },
+                rainyDays: {
+                    $sum: { $cond: [{ $gt: ['$rainfall', 0] }, 1, 0] }
                 }
             }
+        }
         ]);
 
         const result = stats[0] || {
@@ -379,7 +379,7 @@ const getWeatherStats = async(req, res) => {
 // @desc    Bulk import weather data
 // @route   POST /api/weather/bulk-import
 // @access  Private/Admin
-const bulkImportWeather = async(req, res) => {
+const bulkImportWeather = async (req, res) => {
     try {
         const { weatherData } = req.body;
 

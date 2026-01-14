@@ -4,7 +4,7 @@ const Ward = require('../models/Ward');
 // @desc    Get risk index data
 // @route   GET /api/risk-index
 // @access  Public
-const getRiskIndexData = async(req, res) => {
+const getRiskIndexData = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
@@ -49,7 +49,7 @@ const getRiskIndexData = async(req, res) => {
 // @desc    Get risk data by ID
 // @route   GET /api/risk-index/:id
 // @access  Public
-const getRiskById = async(req, res) => {
+const getRiskById = async (req, res) => {
     try {
         const riskData = await RiskIndexData.findById(req.params.id)
             .populate('ward_id', 'ward_name district coordinates')
@@ -78,9 +78,9 @@ const getRiskById = async(req, res) => {
 // @desc    Create risk index data
 // @route   POST /api/risk-index
 // @access  Private/Admin
-const createRiskIndexData = async(req, res) => {
+const createRiskIndexData = async (req, res) => {
     try {
-        const riskData = {...req.body };
+        const riskData = { ...req.body };
 
         const ward = await Ward.findById(riskData.ward_id);
         if (!ward) {
@@ -126,9 +126,9 @@ const createRiskIndexData = async(req, res) => {
 // @desc    Update risk index data
 // @route   PUT /api/risk-index/:id
 // @access  Private/Admin
-const updateRiskIndexData = async(req, res) => {
+const updateRiskIndexData = async (req, res) => {
     try {
-        const updateData = {...req.body };
+        const updateData = { ...req.body };
 
         const existingRisk = await RiskIndexData.findById(req.params.id);
         if (!existingRisk) {
@@ -180,7 +180,7 @@ const updateRiskIndexData = async(req, res) => {
 // @desc    Delete risk index data
 // @route   DELETE /api/risk-index/:id
 // @access  Private/Admin
-const deleteRiskIndexData = async(req, res) => {
+const deleteRiskIndexData = async (req, res) => {
     try {
         const riskData = await RiskIndexData.findById(req.params.id);
 
@@ -209,7 +209,7 @@ const deleteRiskIndexData = async(req, res) => {
 // @desc    Get risk history for a ward
 // @route   GET /api/risk-index/ward/:wardId
 // @access  Public
-const getRiskHistoryByWard = async(req, res) => {
+const getRiskHistoryByWard = async (req, res) => {
     try {
         const { wardId } = req.params;
         const limit = parseInt(req.query.limit) || 30;
@@ -246,7 +246,7 @@ const getRiskHistoryByWard = async(req, res) => {
 // @desc    Get current risk levels for all wards
 // @route   GET /api/risk-index/current
 // @access  Public
-const getCurrentRiskLevels = async(req, res) => {
+const getCurrentRiskLevels = async (req, res) => {
     try {
         const currentRiskLevels = await RiskIndexData.getCurrentRiskLevels();
 
@@ -267,7 +267,7 @@ const getCurrentRiskLevels = async(req, res) => {
 // @desc    Recalculate risk index
 // @route   POST /api/risk-index/:id/recalculate
 // @access  Private/Admin
-const recalculateRisk = async(req, res) => {
+const recalculateRisk = async (req, res) => {
     try {
         const riskData = await RiskIndexData.findById(req.params.id);
 
@@ -299,7 +299,7 @@ const recalculateRisk = async(req, res) => {
 // @desc    Get risk trend analysis
 // @route   GET /api/risk-index/trend/:wardId
 // @access  Public
-const getRiskTrend = async(req, res) => {
+const getRiskTrend = async (req, res) => {
     try {
         const { wardId } = req.params;
         const days = parseInt(req.query.days) || 30;
@@ -340,7 +340,7 @@ const getRiskTrend = async(req, res) => {
 // @desc    Bulk import risk index data
 // @route   POST /api/risk/bulk-import
 // @access  Private/Admin
-const bulkImportRisk = async(req, res) => {
+const bulkImportRisk = async (req, res) => {
     try {
         const { riskData } = req.body;
 

@@ -4,7 +4,7 @@ const Ward = require('../models/Ward');
 // @desc    Get road/bridge data
 // @route   GET /api/road-bridge
 // @access  Public
-const getRoadBridgeData = async(req, res) => {
+const getRoadBridgeData = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -45,7 +45,7 @@ const getRoadBridgeData = async(req, res) => {
 // @desc    Get road/bridge by ID
 // @route   GET /api/road-bridge/:id
 // @access  Public
-const getRoadBridgeById = async(req, res) => {
+const getRoadBridgeById = async (req, res) => {
     try {
         const roadBridge = await RoadBridgeData.findById(req.params.id)
             .populate('ward_id', 'ward_name district coordinates');
@@ -73,9 +73,9 @@ const getRoadBridgeById = async(req, res) => {
 // @desc    Create road/bridge data
 // @route   POST /api/road-bridge
 // @access  Private/Admin
-const createRoadBridgeData = async(req, res) => {
+const createRoadBridgeData = async (req, res) => {
     try {
-        const roadBridgeData = {...req.body };
+        const roadBridgeData = { ...req.body };
 
         const ward = await Ward.findById(roadBridgeData.ward_id);
         if (!ward) {
@@ -114,9 +114,9 @@ const createRoadBridgeData = async(req, res) => {
 // @desc    Update road/bridge data
 // @route   PUT /api/road-bridge/:id
 // @access  Private/Admin
-const updateRoadBridgeData = async(req, res) => {
+const updateRoadBridgeData = async (req, res) => {
     try {
-        const updateData = {...req.body };
+        const updateData = { ...req.body };
 
         const existingRoadBridge = await RoadBridgeData.findById(req.params.id);
         if (!existingRoadBridge) {
@@ -168,7 +168,7 @@ const updateRoadBridgeData = async(req, res) => {
 // @desc    Delete road/bridge data
 // @route   DELETE /api/road-bridge/:id
 // @access  Private/Admin
-const deleteRoadBridgeData = async(req, res) => {
+const deleteRoadBridgeData = async (req, res) => {
     try {
         const roadBridge = await RoadBridgeData.findById(req.params.id);
 
@@ -197,7 +197,7 @@ const deleteRoadBridgeData = async(req, res) => {
 // @desc    Get road/bridge data by ward
 // @route   GET /api/road-bridge/ward/:wardId
 // @access  Public
-const getRoadBridgeByWard = async(req, res) => {
+const getRoadBridgeByWard = async (req, res) => {
     try {
         const ward = await Ward.findById(req.params.wardId);
         if (!ward) {
@@ -234,7 +234,7 @@ const getRoadBridgeByWard = async(req, res) => {
 // @desc    Get high-risk infrastructure
 // @route   GET /api/road-bridge/high-risk
 // @access  Public
-const getHighRiskInfrastructure = async(req, res) => {
+const getHighRiskInfrastructure = async (req, res) => {
     try {
         const highRiskInfra = await RoadBridgeData.getHighRiskInfrastructure()
             .populate('ward_id', 'ward_name district');
@@ -256,7 +256,7 @@ const getHighRiskInfrastructure = async(req, res) => {
 // @desc    Get infrastructure needing inspection
 // @route   GET /api/road-bridge/inspection-needed
 // @access  Public
-const getInspectionNeeded = async(req, res) => {
+const getInspectionNeeded = async (req, res) => {
     try {
         const inspectionNeeded = await RoadBridgeData.getNeedingInspection()
             .populate('ward_id', 'ward_name district');
@@ -278,7 +278,7 @@ const getInspectionNeeded = async(req, res) => {
 // @desc    Bulk import road bridge data
 // @route   POST /api/road-bridge/bulk-import
 // @access  Private/Admin
-const bulkImportRoadBridge = async(req, res) => {
+const bulkImportRoadBridge = async (req, res) => {
     try {
         const { roadBridgeData } = req.body;
 
