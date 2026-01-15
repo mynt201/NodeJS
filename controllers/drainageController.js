@@ -361,12 +361,13 @@ const bulkImportDrainage = async (req, res) => {
                 const drainage = await DrainageData.create({
                     drainage_id: data.drainage_id,
                     ward_id: ward._id,
-                    drainage_type: data.drainage_type || 'Main Drain',
+                    name: data.name,
+                    type: data.drainage_type || 'drain',
                     length: data.length || 0,
                     diameter: data.diameter || 0,
                     material: data.material || 'Concrete',
                     coordinates: data.coordinates ? JSON.parse(data.coordinates) : [],
-                    status: data.status || 'Active',
+                    status: data.status || 'operational',
                     last_maintenance: data.last_maintenance || null,
                     description: data.description || ''
                 });

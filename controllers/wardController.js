@@ -112,9 +112,18 @@ const createWard = async (req, res) => {
     try {
         const wardData = { ...req.body };
 
+        // Check if ward code already exists
+        const existingWardByCode = await Ward.findOne({ ward_code: wardData.ward_code });
+        if (existingWardByCode) {
+            return res.status(400).json({
+                success: false,
+                error: 'Ward with this code already exists'
+            });
+        }
+
         // Check if ward name already exists
-        const existingWard = await Ward.findOne({ ward_name: wardData.ward_name });
-        if (existingWard) {
+        const existingWardByName = await Ward.findOne({ ward_name: wardData.ward_name });
+        if (existingWardByName) {
             return res.status(400).json({
                 success: false,
                 error: 'Ward with this name already exists'
@@ -416,9 +425,19 @@ const bulkImportWards = async (req, res) => {
 
         for (const wardData of wards) {
             try {
-                // Check for duplicates
-                const existingWard = await Ward.findOne({ ward_name: wardData.ward_name });
-                if (existingWard) {
+                // Check for duplicates by ward_code
+                const existingWardByCode = await Ward.findOne({ ward_code: wardData.ward_code });
+                if (existingWardByCode) {
+                    results.duplicates.push({
+                        ward_code: wardData.ward_code,
+                        reason: 'Ward code already exists'
+                    });
+                    continue;
+                }
+
+                // Check for duplicates by ward_name
+                const existingWardByName = await Ward.findOne({ ward_name: wardData.ward_name });
+                if (existingWardByName) {
                     results.duplicates.push({
                         ward_name: wardData.ward_name,
                         reason: 'Ward name already exists'

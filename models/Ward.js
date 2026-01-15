@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 
 const wardSchema = new mongoose.Schema({
+  ward_code: {
+    type: String,
+    required: [true, 'Ward code is required'],
+    unique: true,
+    trim: true,
+    maxlength: [20, 'Ward code cannot exceed 20 characters']
+  },
   ward_name: {
     type: String,
     required: [true, 'Ward name is required'],
