@@ -1,0 +1,326 @@
+{
+    "info": {
+        "_postman_id": "flood-risk-weather-api",
+        "name": "Flood Risk - Weather API",
+        "description": "Complete API collection for Weather Data Management endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [{
+            "name": "Public Endpoints",
+            "item": [{
+                    "name": "Get Weather Data",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}?page=1&limit=50&ward_id=&date_from=&date_to=&is_forecast=&sort=date&order=desc",
+                            "host": ["{{base_url}}"],
+                            "path": [""],
+                            "query": [{
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "50",
+                                    "description": "Items per page (max 100)"
+                                },
+                                {
+                                    "key": "ward_id",
+                                    "value": "",
+                                    "description": "Filter by ward ID",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "date_from",
+                                    "value": "",
+                                    "description": "ISO8601 date - Filter from",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "date_to",
+                                    "value": "",
+                                    "description": "ISO8601 date - Filter to",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "is_forecast",
+                                    "value": "",
+                                    "description": "Filter by forecast: true or false",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "date",
+                                    "description": "Sort field: date, temperature.current, rainfall, humidity, createdAt"
+                                },
+                                {
+                                    "key": "order",
+                                    "value": "desc",
+                                    "description": "Sort order: asc or desc"
+                                }
+                            ]
+                        },
+                        "description": "Get weather data with pagination and filters"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Weather by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/:id",
+                            "host": ["{{base_url}}"],
+                            "path": [":id"],
+                            "variable": [{
+                                "key": "id",
+                                "value": "507f1f77bcf86cd799439011",
+                                "description": "MongoDB ObjectId"
+                            }]
+                        },
+                        "description": "Get weather data by ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Weather by Ward",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/ward/:wardId?page=1&limit=30&date_from=&date_to=",
+                            "host": ["{{base_url}}"],
+                            "path": ["ward", ":wardId"],
+                            "query": [{
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "30",
+                                    "description": "Items per page"
+                                },
+                                {
+                                    "key": "date_from",
+                                    "value": "",
+                                    "description": "ISO8601 date - Filter from",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "date_to",
+                                    "value": "",
+                                    "description": "ISO8601 date - Filter to",
+                                    "disabled": true
+                                }
+                            ],
+                            "variable": [{
+                                "key": "wardId",
+                                "value": "{{ward_id}}",
+                                "description": "MongoDB ObjectId of ward"
+                            }]
+                        },
+                        "description": "Get weather data for a specific ward"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Latest Weather",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/latest",
+                            "host": ["{{base_url}}"],
+                            "path": ["latest"]
+                        },
+                        "description": "Get latest weather data for all wards"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Weather Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/stats/:wardId?days=30",
+                            "host": ["{{base_url}}"],
+                            "path": ["stats", ":wardId"],
+                            "query": [{
+                                "key": "days",
+                                "value": "30",
+                                "description": "Number of days (1-365)"
+                            }],
+                            "variable": [{
+                                "key": "wardId",
+                                "value": "{{ward_id}}",
+                                "description": "MongoDB ObjectId of ward"
+                            }]
+                        },
+                        "description": "Get weather statistics for a ward"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Admin Only",
+            "item": [{
+                    "name": "Create Weather Data",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [{
+                                "key": "token",
+                                "value": "{{token}}",
+                                "type": "string"
+                            }]
+                        },
+                        "method": "POST",
+                        "header": [{
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"ward_id\": \"{{ward_id}}\",\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"temperature\": {\n    \"current\": 28.5,\n    \"min\": 25.0,\n    \"max\": 32.0,\n    \"feels_like\": 30.0\n  },\n  \"humidity\": 75,\n  \"rainfall\": 5.2,\n  \"wind_speed\": 15.5,\n  \"wind_direction\": 180,\n  \"wind_gust\": 20.0,\n  \"pressure\": 1013.25,\n  \"visibility\": 10.0,\n  \"weather_condition\": {\n    \"main\": \"Rain\",\n    \"description\": \"Light rain\",\n    \"icon\": \"10d\"\n  },\n  \"uv_index\": 5,\n  \"aqi\": 50,\n  \"data_source\": \"weather_api\",\n  \"is_forecast\": false,\n  \"confidence_level\": 100\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": ["{{base_url}}"],
+                            "path": [""]
+                        },
+                        "description": "Create new weather data (Admin only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Weather Data",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [{
+                                "key": "token",
+                                "value": "{{token}}",
+                                "type": "string"
+                            }]
+                        },
+                        "method": "PUT",
+                        "header": [{
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"temperature\": {\n    \"current\": 30.0,\n    \"max\": 35.0\n  },\n  \"humidity\": 80,\n  \"rainfall\": 10.5,\n  \"weather_condition\": {\n    \"main\": \"Thunderstorm\",\n    \"description\": \"Heavy thunderstorm\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/:id",
+                            "host": ["{{base_url}}"],
+                            "path": [":id"],
+                            "variable": [{
+                                "key": "id",
+                                "value": "507f1f77bcf86cd799439011",
+                                "description": "MongoDB ObjectId"
+                            }]
+                        },
+                        "description": "Update weather data (Admin only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Weather Data",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [{
+                                "key": "token",
+                                "value": "{{token}}",
+                                "type": "string"
+                            }]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/:id",
+                            "host": ["{{base_url}}"],
+                            "path": [":id"],
+                            "variable": [{
+                                "key": "id",
+                                "value": "507f1f77bcf86cd799439011",
+                                "description": "MongoDB ObjectId"
+                            }]
+                        },
+                        "description": "Delete weather data (Admin only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Bulk Import Weather Data",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [{
+                                "key": "token",
+                                "value": "{{token}}",
+                                "type": "string"
+                            }]
+                        },
+                        "method": "POST",
+                        "header": [{
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"weatherData\": [\n    {\n      \"ward_id\": \"{{ward_id}}\",\n      \"date\": \"2024-01-15T00:00:00.000Z\",\n      \"temperature\": {\n        \"current\": 28.5,\n        \"min\": 25.0,\n        \"max\": 32.0\n      },\n      \"humidity\": 75,\n      \"rainfall\": 5.2\n    },\n    {\n      \"ward_id\": \"{{ward_id}}\",\n      \"date\": \"2024-01-16T00:00:00.000Z\",\n      \"temperature\": {\n        \"current\": 29.0,\n        \"min\": 26.0,\n        \"max\": 33.0\n      },\n      \"humidity\": 70,\n      \"rainfall\": 0\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/bulk-import",
+                            "host": ["{{base_url}}"],
+                            "path": ["bulk-import"]
+                        },
+                        "description": "Bulk import weather data (Admin only)"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "event": [{
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        }
+    ],
+    "variable": [{
+            "key": "base_url",
+            "value": "http://localhost:3000/api/weather",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "ward_id",
+            "value": "",
+            "type": "string",
+            "description": "Ward ID for testing weather endpoints"
+        }
+    ]
+}
