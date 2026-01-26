@@ -7,7 +7,7 @@ const Ward = require('../models/Ward');
 const getWeatherData = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 50;
+        const limit = Math.min(parseInt(req.query.limit) || 50, 100); // Max 100 items per page
         const skip = (page - 1) * limit;
 
         // Build filter

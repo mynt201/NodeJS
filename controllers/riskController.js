@@ -7,7 +7,7 @@ const Ward = require('../models/Ward');
 const getRiskIndexData = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
+        const limit = Math.min(parseInt(req.query.limit) || 20, 100); // Max 100 items per page
         const skip = (page - 1) * limit;
 
         const filter = {};
@@ -359,26 +359,26 @@ const bulkImportRisk = async (req, res) => {
 
         for (const data of riskData) {
             try {
-                // Check for duplicates by ward_code and date
-                const existingRisk = await RiskIndexData.findOne({
-                    ward_code: data.ward_code,
-                    date: new Date(data.date)
-                });
-                if (existingRisk) {
-                    results.duplicates.push({
-                        ward_code: data.ward_code,
-                        date: data.date,
-                        reason: 'Risk data for this ward and date already exists'
+                // Find ward by ward_name (ward_id in CSV maps to ward_name)
+                const ward = await Ward.findOne({ ward_name: data.ward_id || data.ward_name });
+                if (!ward) {
+                    results.failed.push({
+                        ward_id: data.ward_id || 'Unknown',
+                        error: `Ward with name ${data.ward_id || data.ward_name} not found`
                     });
                     continue;
                 }
 
-                // Find ward by ward_code
-                const ward = await Ward.findOne({ ward_code: data.ward_code });
-                if (!ward) {
-                    results.failed.push({
-                        ward_code: data.ward_code,
-                        error: `Ward with code ${data.ward_code} not found`
+                // Check for duplicates by ward_id and date
+                const existingRisk = await RiskIndexData.findOne({
+                    ward_id: ward._id,
+                    date: new Date(data.date)
+                });
+                if (existingRisk) {
+                    results.duplicates.push({
+                        ward_id: ward._id,
+                        date: data.date,
+                        reason: 'Risk data for this ward and date already exists'
                     });
                     continue;
                 }
@@ -386,14 +386,12 @@ const bulkImportRisk = async (req, res) => {
                 // Create risk index data
                 const riskRecord = await RiskIndexData.create({
                     ward_id: ward._id,
-                    ward_code: data.ward_code,
                     date: new Date(data.date),
-                    rainfall_risk: data.rainfall_risk || 'Low',
-                    drainage_risk: data.drainage_risk || 'Low',
-                    flood_history_risk: data.flood_history_risk || 'Low',
-                    topography_risk: data.topography_risk || 'Low',
-                    population_density_risk: data.population_density_risk || 'Low',
-                    overall_risk: data.overall_risk || 'Low',
+                    exposure: data.exposure || 0,
+                    susceptibility: data.susceptibility || 0,
+                    resilience: data.resilience || 0,
+                    risk_index: data.risk_index || 0,
+                    risk_category: data.risk_category || 'Low',
                     description: data.description || ''
                 });
 

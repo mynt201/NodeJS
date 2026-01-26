@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "import-wards-gadm": "node scripts/import-wards-from-gadm.js"
     },
     "keywords": [],
     "author": "",
@@ -18,7 +19,8 @@
         "express": "^5.2.1",
         "express-validator": "^7.3.1",
         "jsonwebtoken": "^9.0.3",
-        "mongoose": "^9.1.2"
+        "mongoose": "^9.1.2",
+        "yup": "^1.7.1"
     },
     "devDependencies": {
         "nodemon": "^3.1.11"

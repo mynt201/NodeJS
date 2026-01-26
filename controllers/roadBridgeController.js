@@ -307,12 +307,12 @@ const bulkImportRoadBridge = async (req, res) => {
                     continue;
                 }
 
-                // Find ward by ward_code
-                const ward = await Ward.findOne({ ward_code: data.ward_code });
+                // Find ward by ward_name (ward_code in CSV maps to ward_name)
+                const ward = await Ward.findOne({ ward_name: data.ward_code || data.ward_name });
                 if (!ward) {
                     results.failed.push({
                         structure_id: data.structure_id || 'Unknown',
-                        error: `Ward with code ${data.ward_code} not found`
+                        error: `Ward with name ${data.ward_code || data.ward_name} not found`
                     });
                     continue;
                 }

@@ -365,7 +365,7 @@ const getWardStats = async (req, res) => {
         ]);
 
         // Calculate percentages
-        // const totalWards = stats[0]? .totalWards || 0;
+        const totalWards = stats[0]?.totalWards || 0;
         const riskLevelStats = riskDistribution.map(item => ({
             label: item.risk_level,
             count: item.count,
