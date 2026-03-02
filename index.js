@@ -13,6 +13,7 @@ const riskAssessmentRoutes = require("./routes/riskAssessmentRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const mapRoutes = require("./routes/mapRoutes");
 const wardRoutes = require("./routes/wardRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/risk-assessments", riskAssessmentRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/map", mapRoutes);
 app.use("/api/wards", wardRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Migration: thêm direction cho chỉ số cũ (1 = thuận, 0 = nghịch)
 const migrateDirection = async () => {
@@ -116,18 +118,14 @@ app.get("/api/health", (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    error: "Something went wrong!",
-    message:
-      process.env.NODE_ENV === "development"
-        ? err.message
-        : "Internal server error",
+    error: "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.",
   });
 });
 
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
-    error: "Route not found",
+    error: "Không tìm thấy API",
     path: req.originalUrl,
   });
 });

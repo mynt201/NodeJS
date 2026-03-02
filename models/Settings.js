@@ -314,8 +314,8 @@ settingsSchema.statics.getSystemStats = function() {
   }]);
 };
 
-// Pre-save middleware to validate risk thresholds
-settingsSchema.pre('save', function(next) {
+// Pre-save middleware to validate risk thresholds (Mongoose 9: async, no next callback)
+settingsSchema.pre('save', function() {
   const thresholds = this.riskThresholds;
 
   if (thresholds) {
@@ -325,12 +325,9 @@ settingsSchema.pre('save', function(next) {
                       thresholds.high < thresholds.veryHigh;
 
     if (!validOrder) {
-      const error = new Error('Risk thresholds must be in ascending order');
-      return next(error);
+      throw new Error('Risk thresholds must be in ascending order');
     }
   }
-
-  next();
 });
 
 module.exports = mongoose.model('Settings', settingsSchema);

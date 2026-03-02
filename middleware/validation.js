@@ -1,17 +1,20 @@
 const { body, param, query, validationResult } = require('express-validator');
 
-// Handle validation errors
+// Handle validation errors: trả về key -> message cho FE dễ xử lý
 const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    const fieldErrors = {};
+    result.array().forEach((err) => {
+      if (err.path && !fieldErrors[err.path]) {
+        fieldErrors[err.path] = err.msg;
+      }
+    });
+
     return res.status(400).json({
       success: false,
-      error: 'Validation failed',
-      details: errors.array().map(err => ({
-        field: err.path,
-        message: err.msg,
-        value: err.value
-      }))
+      error: 'Dữ liệu không hợp lệ',
+      errors: fieldErrors,
     });
   }
   next();

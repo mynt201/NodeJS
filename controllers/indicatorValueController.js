@@ -3,6 +3,78 @@ const AdministrativeUnit = require('../models/AdministrativeUnit');
 const FloodIndicator = require('../models/FloodIndicator');
 
 /**
+ * GET /indicator-values/template?unit_id=xxx&year=2024|all
+ * Trả về CSV mẫu: 1 phường, năm có thể 1 năm hoặc nhiều năm.
+ * unit_id bắt buộc. year=all hoặc rỗng: nhiều năm (4 năm).
+ */
+const downloadTemplate = async (req, res) => {
+    try {
+        const unitIdParam = req.query.unit_id;
+        const yearParam = req.query.year;
+        const currentYear = new Date().getFullYear();
+
+        if (!unitIdParam || unitIdParam === 'all') {
+            return res.status(400).json({
+                success: false,
+                error: 'Chọn 1 phường để tải template',
+            });
+        }
+
+        const isAllYears = !yearParam || yearParam === 'all';
+        const wardAdminId = req.user?.role === 'WARD_ADMIN' && req.user.ward_id
+            ? (req.user.ward_id.toString?.() || req.user.ward_id)
+            : null;
+
+        if (wardAdminId && unitIdParam !== wardAdminId) {
+            return res.status(403).json({
+                success: false,
+                error: 'Quản lý phường chỉ được tải template cho phường của mình',
+            });
+        }
+
+        const unit = await AdministrativeUnit.findById(unitIdParam).select('_id name').lean();
+        if (!unit) {
+            return res.status(404).json({ success: false, error: 'Không tìm thấy phường' });
+        }
+        const units = [{ _id: unitIdParam, name: unit.name }];
+
+        const years = isAllYears
+            ? [currentYear - 2, currentYear - 1, currentYear, currentYear + 1]
+            : [parseInt(yearParam) || currentYear];
+
+        const indicators = await FloodIndicator.find({}).sort({ code: 1 }).select('code name unit').lean();
+        const headerIndicators = indicators.map((i) => {
+            const fullName = (i.name || i.code).trim();
+            const unitStr = i.unit ? ` (${i.unit})` : '';
+            return `${fullName} [${i.code}]${unitStr}`;
+        });
+        const headers = ['năm', ...headerIndicators];
+
+        const rows = [];
+        for (const y of years) {
+            rows.push([
+                y,
+                ...indicators.map(() => '0'),
+            ]);
+        }
+
+        const escapeCsv = (v) => `"${String(v).replace(/"/g, '""')}"`;
+        const csvLines = [headers.map(escapeCsv).join(','), ...rows.map((r) => r.map(escapeCsv).join(','))];
+        const bom = '\uFEFF';
+        const safeFilename = `ChiSoRuiRo_Template.csv`;
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+        res.send(bom + csvLines.join('\n'));
+    } catch (err) {
+        console.error('Download template error:', err);
+        res.status(500).json({
+            success: false,
+            error: 'Lỗi hệ thống khi tải template. Vui lòng thử lại sau.',
+        });
+    }
+};
+
+/**
  * Chuẩn hóa Min-Max theo direction của FloodIndicator:
  * - Thuận (direction=1): normalized = (giá trị − min) / (max − min) — càng cao càng rủi ro
  * - Nghịch (direction=0): normalized = (max − giá trị) / (max − min) — càng cao càng an toàn
@@ -63,7 +135,7 @@ const getValues = async (req, res) => {
         console.error('Get indicator values error:', err);
         res.status(500).json({
             success: false,
-            error: err.message
+            error: 'Lỗi hệ thống khi lấy danh sách chỉ số. Vui lòng thử lại sau.',
         });
     }
 };
@@ -88,7 +160,7 @@ const getValueById = async (req, res) => {
         console.error('Get value error:', err);
         res.status(500).json({
             success: false,
-            error: err.message
+            error: 'Lỗi hệ thống khi lấy chi tiết chỉ số. Vui lòng thử lại sau.',
         });
     }
 };
@@ -131,7 +203,7 @@ const createValue = async (req, res) => {
         }
         res.status(500).json({
             success: false,
-            error: err.message
+            error: 'Lỗi hệ thống khi tạo chỉ số. Vui lòng thử lại sau.',
         });
     }
 };
@@ -166,7 +238,7 @@ const updateValue = async (req, res) => {
         console.error('Update value error:', err);
         res.status(500).json({
             success: false,
-            error: err.message
+            error: 'Lỗi hệ thống khi cập nhật chỉ số. Vui lòng thử lại sau.',
         });
     }
 };
@@ -250,6 +322,22 @@ const bulkUpsert = async (req, res) => {
                 error: 'items là mảng bắt buộc'
             });
         }
+        if (req.user?.role === 'WARD_ADMIN' && req.user.ward_id) {
+            const wardIdStr = req.user.ward_id.toString?.() || req.user.ward_id;
+            const invalid = items.some((it) => (it.unit_id?.toString?.() || it.unit_id) !== wardIdStr);
+            if (invalid) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Quản lý phường chỉ được cập nhật dữ liệu cho phường của mình',
+                });
+            }
+        }
+        const sanitizeId = (id) => {
+            if (id == null) return null;
+            const s = String(id).trim().replace(/^"+|"+$/g, '');
+            return s || null;
+        };
+
         const results = [];
         const groupsToRecompute = new Set();
         for (const it of items) {
@@ -260,10 +348,15 @@ const bulkUpsert = async (req, res) => {
                 year,
                 raw_value
             } = it;
-            const yr = parseInt(data_year || year);
+            const cleanUnitId = sanitizeId(unit_id);
+            const cleanIndicatorId = sanitizeId(indicator_id);
+            const yr = parseInt(data_year || year, 10);
+            if (!cleanUnitId || !cleanIndicatorId || isNaN(yr) || yr < 2000 || yr > 2100) {
+                continue;
+            }
             const filter = {
-                unit_id,
-                indicator_id,
+                unit_id: cleanUnitId,
+                indicator_id: cleanIndicatorId,
                 data_year: yr
             };
             const update = {
@@ -312,4 +405,5 @@ module.exports = {
     upsertValue,
     deleteValue,
     bulkUpsert,
+    downloadTemplate,
 };

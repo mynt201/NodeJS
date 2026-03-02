@@ -10,7 +10,9 @@
         "import-units": "node utils/import-administrative-units-from-gadm.js",
         "import-geometry": "node utils/import-geometry-from-gadm.js",
         "seed-new": "node utils/seed-new-schema.js",
-        "db:reset": "node utils/reset-and-seed.js"
+        "db:reset": "node utils/reset-and-seed.js",
+        "db:fix-indicator-index": "node utils/fix-indicator-value-index.js",
+        "fetch-elevation": "node utils/fetch-elevation-for-wards.js"
     },
     "keywords": [],
     "author": "",
@@ -19,11 +21,14 @@
         "axios": "^1.13.2",
         "bcryptjs": "^3.0.3",
         "cors": "^2.8.5",
+        "dejavu-fonts-ttf": "^2.37.3",
         "dotenv": "^17.2.3",
+        "exceljs": "^4.4.0",
         "express": "^5.2.1",
         "express-validator": "^7.3.1",
         "jsonwebtoken": "^9.0.3",
-        "mongoose": "^9.1.2"
+        "mongoose": "^9.1.2",
+        "pdfkit": "^0.17.2"
     },
     "devDependencies": {
         "nodemon": "^3.1.11"

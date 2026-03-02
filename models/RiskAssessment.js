@@ -16,14 +16,14 @@ const riskAssessmentSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Điểm rủi ro là bắt buộc"],
         min: [0, "Điểm rủi ro không được âm"],
-        max: [10, "Điểm rủi ro tối đa là 10"],
+        max: [1, "Điểm rủi ro tối đa là 1 (Σ weight×normalized_value)"],
     },
     risk_level: {
         type: String,
         required: [true, "Mức độ rủi ro là bắt buộc"],
         enum: {
-            values: ["Rất thấp", "Thấp", "Trung bình", "Cao", "Rất cao"],
-            message: "Mức độ phải là: Rất thấp, Thấp, Trung bình, Cao, Rất cao",
+            values: ["Thấp", "Trung bình", "Cao"],
+            message: "Mức độ phải là: Thấp (<0.34), Trung bình (0.34-0.66), Cao (>0.66)",
         },
     },
 }, {
@@ -40,7 +40,7 @@ riskAssessmentSchema.index({
     year: 1,
 });
 riskAssessmentSchema.index({
-    risk_level: 1
+    risk_level: 1,
 });
 
 module.exports = mongoose.model("RiskAssessment", riskAssessmentSchema);
