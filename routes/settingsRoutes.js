@@ -23,7 +23,7 @@ router.post('/reset', resetSettings);
 router.put('/notifications', settingsValidation.notifications, updateNotifications);
 
 // Admin only routes
-router.get('/stats', authorize('admin'), getSystemStats);
+router.get('/stats', authorize('SUPER_ADMIN'), getSystemStats);
 
 // Public routes
 router.get('/defaults', getDefaults);

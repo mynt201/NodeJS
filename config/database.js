@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.DATABASE_URL, {
+    const uri = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/dbconnect';
+    const conn = await mongoose.connect(uri, {
       // These options are no longer needed in newer versions of mongoose
       // but keeping them for compatibility
     });

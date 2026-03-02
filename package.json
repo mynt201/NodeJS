@@ -7,8 +7,10 @@
         "start": "node index.js",
         "dev": "nodemon index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "sync-weather": "node scripts/sync-weather.js",
-        "import-wards": "node utils/import-wards-from-gadm.js"
+        "import-units": "node utils/import-administrative-units-from-gadm.js",
+        "import-geometry": "node utils/import-geometry-from-gadm.js",
+        "seed-new": "node utils/seed-new-schema.js",
+        "db:reset": "node utils/reset-and-seed.js"
     },
     "keywords": [],
     "author": "",

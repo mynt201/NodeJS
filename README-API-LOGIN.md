@@ -12,10 +12,19 @@ POST /api/users/login
 
 ## 📥 Request Body
 
+**Đăng nhập bằng email:**
 ```json
 {
-  "email": "user@example.com",
-  "password": "userpassword"
+  "email": "admin@floodrisk.com",
+  "password": "admin123"
+}
+```
+
+**Đăng nhập bằng username:**
+```json
+{
+  "username": "admin_thu_duc",
+  "password": "admin123"
 }
 ```
 
@@ -23,7 +32,8 @@ POST /api/users/login
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `email` | string | ✅ | Email address của user (sẽ được normalize thành lowercase) |
+| `email` | string | Một trong hai | Email address (sẽ được normalize thành lowercase) |
+| `username` | string | Một trong hai | Username của user |
 | `password` | string | ✅ | Mật khẩu của user |
 
 ## 📤 Response
@@ -170,7 +180,7 @@ Nếu hệ thống cũ sử dụng username, bạn có thể:
 
 Nếu gặp vấn đề với API login:
 
-1. Kiểm tra server đang chạy: `http://localhost:3000/api/health`
-2. Kiểm tra MongoDB connection
-3. Xem server logs để debug
-4. Đảm bảo email và password chính xác
+1. **Khởi động lại server** – Dừng và chạy lại `node index.js` trong thư mục flood-risk
+2. Đảm bảo admin có `is_active: true`: chạy `node utils/reset-and-seed.js`
+3. Kiểm tra server: `http://localhost:3000/api/health`
+4. Test: `curl -X POST http://localhost:3000/api/users/login -H "Content-Type: application/json" -d '{"email":"admin@floodrisk.com","password":"admin123"}'`

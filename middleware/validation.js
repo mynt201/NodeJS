@@ -36,226 +36,67 @@ const userValidation = {
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters long'),
 
-    body('fullName')
-      .optional()
+    body('full_name')
       .trim()
-      .isLength({ max: 100 })
-      .withMessage('Full name cannot exceed 100 characters'),
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Họ tên là bắt buộc, từ 2 đến 100 ký tự'),
 
-    body('phone')
+    body('role')
       .optional()
-      .matches(/^[0-9+\-\s()]+$/)
-      .withMessage('Please provide a valid phone number'),
+      .isIn(['SUPER_ADMIN', 'WARD_ADMIN'])
+      .withMessage('Vai trò phải là SUPER_ADMIN hoặc WARD_ADMIN'),
+
+    body('ward_id')
+      .optional()
+      .isMongoId()
+      .withMessage('ward_id phải là ObjectId hợp lệ'),
 
     handleValidationErrors
   ],
 
   login: [
     body('email')
+      .optional()
       .isEmail()
       .normalizeEmail()
       .withMessage('Valid email is required'),
+
+    body('username')
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage('Username cannot be empty'),
 
     body('password')
       .notEmpty()
       .withMessage('Password is required'),
 
+    // Custom: require email OR username
+    (req, res, next) => {
+      if (!req.body.email && !req.body.username) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email or username is required',
+        });
+      }
+      next();
+    },
+
     handleValidationErrors
   ],
 
   updateProfile: [
-    body('fullName')
+    body('full_name')
       .optional()
       .trim()
       .isLength({ max: 100 })
-      .withMessage('Full name cannot exceed 100 characters'),
-
-    body('phone')
-      .optional()
-      .matches(/^[0-9+\-\s()]+$/)
-      .withMessage('Please provide a valid phone number'),
-
-    body('address')
-      .optional()
-      .trim()
-      .isLength({ max: 200 })
-      .withMessage('Address cannot exceed 200 characters'),
+      .withMessage('Họ tên không được vượt quá 100 ký tự'),
 
     body('email')
       .optional()
       .isEmail()
       .normalizeEmail()
-      .withMessage('Please provide a valid email'),
-
-    handleValidationErrors
-  ]
-};
-
-// Ward validation rules
-const wardValidation = {
-  create: [
-    body('ward_name')
-      .trim()
-      .notEmpty()
-      .withMessage('Ward name is required')
-      .isLength({ max: 100 })
-      .withMessage('Ward name cannot exceed 100 characters'),
-
-    body('district')
-      .optional()
-      .trim()
-      .isLength({ max: 100 })
-      .withMessage('District name cannot exceed 100 characters'),
-
-    body('province')
-      .optional()
-      .trim()
-      .isLength({ max: 100 })
-      .withMessage('Province name cannot exceed 100 characters'),
-
-    body('geometry.type')
-      .isIn(['Point', 'LineString', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon'])
-      .withMessage('Invalid geometry type'),
-
-    body('population_density')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Population density must be a positive number'),
-
-    body('rainfall')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Rainfall must be a positive number'),
-
-    body('low_elevation')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Low elevation must be a positive number'),
-
-    body('urban_land')
-      .optional()
-      .isFloat({ min: 0, max: 100 })
-      .withMessage('Urban land percentage must be between 0 and 100'),
-
-    body('drainage_capacity')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Drainage capacity must be a positive number'),
-
-    handleValidationErrors
-  ],
-
-  update: [
-    body('ward_name')
-      .optional()
-      .trim()
-      .notEmpty()
-      .withMessage('Ward name cannot be empty')
-      .isLength({ max: 100 })
-      .withMessage('Ward name cannot exceed 100 characters'),
-
-    body('district')
-      .optional()
-      .trim()
-      .isLength({ max: 100 })
-      .withMessage('District name cannot exceed 100 characters'),
-
-    body('population_density')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Population density must be a positive number'),
-
-    body('rainfall')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Rainfall must be a positive number'),
-
-    body('low_elevation')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Low elevation must be a positive number'),
-
-    body('urban_land')
-      .optional()
-      .isFloat({ min: 0, max: 100 })
-      .withMessage('Urban land percentage must be between 0 and 100'),
-
-    body('drainage_capacity')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Drainage capacity must be a positive number'),
-
-    handleValidationErrors
-  ]
-};
-
-// Weather data validation rules
-const weatherValidation = {
-  create: [
-    body('ward_id')
-      .isMongoId()
-      .withMessage('Valid ward ID is required'),
-
-    body('date')
-      .isISO8601()
-      .withMessage('Valid date is required'),
-
-    body('temperature.current')
-      .optional()
-      .isFloat({ min: -50, max: 60 })
-      .withMessage('Temperature must be between -50°C and 60°C'),
-
-    body('humidity')
-      .isFloat({ min: 0, max: 100 })
-      .withMessage('Humidity must be between 0% and 100%'),
-
-    body('rainfall')
-      .isFloat({ min: 0 })
-      .withMessage('Rainfall must be a positive number'),
-
-    body('wind_speed')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Wind speed must be a positive number'),
-
-    body('wind_direction')
-      .optional()
-      .isFloat({ min: 0, max: 360 })
-      .withMessage('Wind direction must be between 0° and 360°'),
-
-    body('pressure')
-      .optional()
-      .isFloat({ min: 800, max: 1200 })
-      .withMessage('Pressure must be between 800 hPa and 1200 hPa'),
-
-    handleValidationErrors
-  ],
-
-  update: [
-    body('temperature.current')
-      .optional()
-      .isFloat({ min: -50, max: 60 })
-      .withMessage('Temperature must be between -50°C and 60°C'),
-
-    body('humidity')
-      .optional()
-      .isFloat({ min: 0, max: 100 })
-      .withMessage('Humidity must be between 0% and 100%'),
-
-    body('rainfall')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Rainfall must be a positive number'),
-
-    body('wind_speed')
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage('Wind speed must be a positive number'),
-
-    body('wind_direction')
-      .optional()
-      .isFloat({ min: 0, max: 360 })
-      .withMessage('Wind direction must be between 0° and 360°'),
+      .withMessage('Email không hợp lệ'),
 
     handleValidationErrors
   ]
@@ -358,10 +199,8 @@ const queryValidation = {
 
 module.exports = {
   userValidation,
-  wardValidation,
-  weatherValidation,
   settingsValidation,
   idValidation,
   queryValidation,
-  handleValidationErrors
+  handleValidationErrors,
 };

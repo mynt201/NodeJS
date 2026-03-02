@@ -1,27 +1,26 @@
 // Export all models for easy importing
-const User = require('./User');
-const Ward = require('./Ward');
-const WeatherData = require('./WeatherData');
-const DrainageData = require('./DrainageData');
-const RoadBridgeData = require('./RoadBridgeData');
-const RiskIndexData = require('./RiskIndexData');
-const Settings = require('./Settings');
+const User = require("./User");
+const Settings = require("./Settings");
+
+// Schema mới - 4 bảng chính
+const AdministrativeUnit = require("./AdministrativeUnit");
+const FloodIndicator = require("./FloodIndicator");
+const IndicatorValue = require("./IndicatorValue");
+const RiskAssessment = require("./RiskAssessment");
 
 module.exports = {
-    User,
-    Ward,
-    WeatherData,
-    DrainageData,
-    RoadBridgeData,
-    RiskIndexData,
-    Settings
+  User,
+  Settings,
+  AdministrativeUnit,
+  FloodIndicator,
+  IndicatorValue,
+  RiskAssessment,
 };
 
 // Export individual models for direct access
 module.exports.User = User;
-module.exports.Ward = Ward;
-module.exports.WeatherData = WeatherData;
-module.exports.DrainageData = DrainageData;
-module.exports.RoadBridgeData = RoadBridgeData;
-module.exports.RiskIndexData = RiskIndexData;
 module.exports.Settings = Settings;
+module.exports.AdministrativeUnit = AdministrativeUnit;
+module.exports.FloodIndicator = FloodIndicator;
+module.exports.IndicatorValue = IndicatorValue;
+module.exports.RiskAssessment = RiskAssessment;

@@ -127,8 +127,7 @@ const settingsSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes for better performance
-settingsSchema.index({ user_id: 1 });
+// Indexes for better performance (user_id has unique: true already)
 settingsSchema.index({ 'theme': 1 });
 settingsSchema.index({ 'language': 1 });
 
