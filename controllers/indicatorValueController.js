@@ -3,14 +3,15 @@ const AdministrativeUnit = require('../models/AdministrativeUnit');
 const FloodIndicator = require('../models/FloodIndicator');
 
 /**
- * Chuẩn hóa Min-Max:
- * - Thuận (direction=1): I = (x - Min) / (Max - Min) — càng cao càng rủi ro
- * - Nghịch (direction=0): I = (Max - x) / (Max - Min) — càng cao càng an toàn
+ * Chuẩn hóa Min-Max theo direction của FloodIndicator:
+ * - Thuận (direction=1): normalized = (giá trị − min) / (max − min) — càng cao càng rủi ro
+ * - Nghịch (direction=0): normalized = (max − giá trị) / (max − min) — càng cao càng an toàn
  */
 async function recomputeMinMaxNormalized(indicatorId, dataYear) {
     const indicator = await FloodIndicator.findById(indicatorId).select('code direction');
     if (!indicator) return;
-    const isInverse = (indicator.direction ? 1 : 0) === 0;
+    // direction=0 nghịch, direction=1 (hoặc undefined) thuận
+    const isInverse = indicator.direction === 0;
 
     const values = await IndicatorValue.find({
         indicator_id: indicatorId,
@@ -108,7 +109,7 @@ const createValue = async (req, res) => {
             indicator_id,
             data_year: yr,
             raw_value,
-            normalized_value: normalized_value ?? raw_value / 100,
+            normalized_value: 0.5, // placeholder, recomputeMinMaxNormalized sẽ ghi đè
             updated_by: req.user._id,
         };
         const value = await IndicatorValue.create(data);
@@ -187,7 +188,7 @@ const upsertValue = async (req, res) => {
         };
         const update = {
             raw_value,
-            normalized_value: raw_value / 100,
+            normalized_value: 0.5, // placeholder, recomputeMinMaxNormalized sẽ ghi đè
             updated_by: req.user._id,
         };
         const value = await IndicatorValue.findOneAndUpdate(filter, update, {
@@ -267,7 +268,7 @@ const bulkUpsert = async (req, res) => {
             };
             const update = {
                 raw_value,
-                normalized_value: raw_value / 100,
+                normalized_value: 0.5, // placeholder, recomputeMinMaxNormalized sẽ ghi đè
                 updated_by: req.user._id,
             };
             const value = await IndicatorValue.findOneAndUpdate(filter, update, {
