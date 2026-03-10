@@ -1,69 +1,98 @@
 const IndicatorValue = require('../models/IndicatorValue');
 const AdministrativeUnit = require('../models/AdministrativeUnit');
 const FloodIndicator = require('../models/FloodIndicator');
+const { parse } = require('csv-parse/sync');
 
 /**
- * GET /indicator-values/template?unit_id=xxx&year=2024|all
- * Trả về CSV mẫu: 1 phường, năm có thể 1 năm hoặc nhiều năm.
- * unit_id bắt buộc. year=all hoặc rỗng: nhiều năm (4 năm).
+ * Tạo tiêu đề cột rõ ràng cho template: "Tên chỉ số [Mã] - Đơn vị"
+ * @param {Array} indicators - Danh sách chỉ số từ DB
+ * @param {boolean} includeWardColumn - Thêm cột "Phường/Xã" (cho template tất cả phường)
+ */
+function buildTemplateHeaderRow(indicators, includeWardColumn = false) {
+    const yearHeader = 'Năm';
+    const wardHeader = includeWardColumn ? ['Phường/Xã'] : [];
+    const indicatorHeaders = indicators.map((i) => {
+        const name = (i.name || i.code).trim();
+        const unitPart = i.unit ? ` - ${i.unit}` : '';
+        return `${name} [${i.code}]${unitPart}`;
+    });
+    return [yearHeader, ...wardHeader, ...indicatorHeaders];
+}
+
+/**
+ * GET /indicator-values/template?unit_id=xxx|all&year=2024|all
+ * - unit_id=all (chỉ SUPER_ADMIN): template tất cả phường & nhiều năm (cột Năm, Phường/Xã, chỉ số).
+ * - unit_id=<id>: template 1 phường, nhiều năm (cột Năm, chỉ số).
  */
 const downloadTemplate = async (req, res) => {
     try {
-        const unitIdParam = req.query.unit_id;
+        const unitIdParam = (req.query.unit_id || '').toString().trim();
         const yearParam = req.query.year;
         const currentYear = new Date().getFullYear();
-
-        if (!unitIdParam || unitIdParam === 'all') {
-            return res.status(400).json({
-                success: false,
-                error: 'Chọn 1 phường để tải template',
-            });
-        }
-
-        const isAllYears = !yearParam || yearParam === 'all';
+        const isAllUnits = !unitIdParam || unitIdParam.toLowerCase() === 'all';
         const wardAdminId = req.user?.role === 'WARD_ADMIN' && req.user.ward_id
             ? (req.user.ward_id.toString?.() || req.user.ward_id)
             : null;
 
-        if (wardAdminId && unitIdParam !== wardAdminId) {
-            return res.status(403).json({
-                success: false,
-                error: 'Quản lý phường chỉ được tải template cho phường của mình',
-            });
+        if (isAllUnits) {
+            if (wardAdminId) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Chỉ Super Admin mới được tải template tất cả phường. Bạn hãy chọn một phường để tải template.',
+                });
+            }
+        } else {
+            if (wardAdminId && unitIdParam !== wardAdminId) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Quản lý phường chỉ được tải template cho phường của mình',
+                });
+            }
+            const unit = await AdministrativeUnit.findById(unitIdParam).select('_id name').lean();
+            if (!unit) {
+                return res.status(404).json({ success: false, error: 'Không tìm thấy phường' });
+            }
         }
 
-        const unit = await AdministrativeUnit.findById(unitIdParam).select('_id name').lean();
-        if (!unit) {
-            return res.status(404).json({ success: false, error: 'Không tìm thấy phường' });
-        }
-        const units = [{ _id: unitIdParam, name: unit.name }];
-
-        const years = isAllYears
-            ? [currentYear - 2, currentYear - 1, currentYear, currentYear + 1]
-            : [parseInt(yearParam) || currentYear];
+        const isAllYears = !yearParam || yearParam === 'all';
+        const defaultYearRange = [2020, 2021, 2022, 2023, 2024, 2025];
+        const yearRange = isAllYears ? defaultYearRange : [parseInt(yearParam) || currentYear];
 
         const indicators = await FloodIndicator.find({}).sort({ code: 1 }).select('code name unit').lean();
-        const headerIndicators = indicators.map((i) => {
-            const fullName = (i.name || i.code).trim();
-            const unitStr = i.unit ? ` (${i.unit})` : '';
-            return `${fullName} [${i.code}]${unitStr}`;
-        });
-        const headers = ['năm', ...headerIndicators];
+        const escapeCsv = (v) => `"${String(v).replace(/"/g, '""')}"`;
 
-        const rows = [];
-        for (const y of years) {
-            rows.push([
-                y,
-                ...indicators.map(() => '0'),
-            ]);
+        if (isAllUnits) {
+            const units = await AdministrativeUnit.find({}).sort({ name: 1 }).select('_id name').lean();
+            if (units.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Chưa có phường/xã nào. Thêm đơn vị hành chính trước khi tải template.',
+                });
+            }
+            const headers = buildTemplateHeaderRow(indicators, true);
+            const rows = [];
+            for (const u of units) {
+                for (const y of yearRange) {
+                    rows.push([y, u.name, ...indicators.map(() => '0')]);
+                }
+            }
+            const csvLines = [headers.map(escapeCsv).join(','), ...rows.map((r) => r.map(escapeCsv).join(','))];
+            const bom = '\uFEFF';
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', 'attachment; filename="Chi_so_rui_ro_Tat_ca_phuong_nam_Template.csv"');
+            res.send(bom + csvLines.join('\n'));
+            return;
         }
 
-        const escapeCsv = (v) => `"${String(v).replace(/"/g, '""')}"`;
+        const headers = buildTemplateHeaderRow(indicators, false);
+        const rows = [];
+        for (const y of yearRange) {
+            rows.push([y, ...indicators.map(() => '0')]);
+        }
         const csvLines = [headers.map(escapeCsv).join(','), ...rows.map((r) => r.map(escapeCsv).join(','))];
         const bom = '\uFEFF';
-        const safeFilename = `ChiSoRuiRo_Template.csv`;
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+        res.setHeader('Content-Disposition', 'attachment; filename="Chi_so_rui_ro_ngap_lut_Template.csv"');
         res.send(bom + csvLines.join('\n'));
     } catch (err) {
         console.error('Download template error:', err);
@@ -109,6 +138,27 @@ async function recomputeMinMaxNormalized(indicatorId, dataYear) {
         await v.save();
     }
 }
+
+/** Năm mặc định khi chưa có dữ liệu (template và dropdown). */
+const DEFAULT_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+
+/**
+ * GET /indicator-values/years?unit_id=xxx
+ * Trả về danh sách năm có dữ liệu chỉ số (dynamic). Nếu chưa có data thì trả về 2020-2025.
+ */
+const getAvailableYears = async (req, res) => {
+    try {
+        const filter = {};
+        if (req.query.unit_id && req.query.unit_id !== 'all') filter.unit_id = req.query.unit_id;
+        const years = await IndicatorValue.distinct('data_year', filter);
+        const sorted = (years || []).filter((y) => y >= 2000 && y <= 2100).sort((a, b) => b - a);
+        const list = sorted.length > 0 ? sorted : DEFAULT_YEARS;
+        res.json({ success: true, years: list });
+    } catch (err) {
+        console.error('Get available years error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
 
 const getValues = async (req, res) => {
     try {
@@ -311,88 +361,304 @@ const deleteValue = async (req, res) => {
     }
 };
 
+const sanitizeId = (id) => {
+    if (id == null) return null;
+    const s = String(id).trim().replace(/^"+|"+$/g, '');
+    return s || null;
+};
+
+/** Thực hiện bulk upsert (dùng chung cho bulkUpsert và uploadCsv). */
+async function doBulkUpsert(req, items) {
+    if (!Array.isArray(items) || items.length === 0) {
+        const err = new Error('items là mảng bắt buộc');
+        err.statusCode = 400;
+        throw err;
+    }
+    if (req.user?.role === 'WARD_ADMIN' && req.user.ward_id) {
+        const wardIdStr = req.user.ward_id.toString?.() || req.user.ward_id;
+        const invalid = items.some((it) => (it.unit_id?.toString?.() || it.unit_id) !== wardIdStr);
+        if (invalid) {
+            const err = new Error('Quản lý phường chỉ được cập nhật dữ liệu cho phường của mình');
+            err.statusCode = 403;
+            throw err;
+        }
+    }
+    const results = [];
+    const groupsToRecompute = new Set();
+    for (const it of items) {
+        const { unit_id, indicator_id, data_year, year, raw_value } = it;
+        const cleanUnitId = sanitizeId(unit_id);
+        const cleanIndicatorId = sanitizeId(indicator_id);
+        const yr = parseInt(data_year || year, 10);
+        if (!cleanUnitId || !cleanIndicatorId || isNaN(yr) || yr < 2000 || yr > 2100) continue;
+        const filter = { unit_id: cleanUnitId, indicator_id: cleanIndicatorId, data_year: yr };
+        const update = {
+            raw_value,
+            normalized_value: 0.5,
+            updated_by: req.user._id,
+        };
+        const value = await IndicatorValue.findOneAndUpdate(filter, update, {
+            new: true,
+            upsert: true,
+            runValidators: true,
+        });
+        results.push(value);
+        groupsToRecompute.add(`${indicator_id}|${yr}`);
+    }
+    for (const key of groupsToRecompute) {
+        const [indicatorId, yr] = key.split('|');
+        await recomputeMinMaxNormalized(indicatorId, parseInt(yr));
+    }
+    const populatedResults = await IndicatorValue.find({ _id: { $in: results.map((r) => r._id) } })
+        .populate('unit_id', 'name')
+        .populate('indicator_id', 'code name');
+    return { success: true, data: populatedResults, count: populatedResults.length };
+}
+
 const bulkUpsert = async (req, res) => {
     try {
-        const {
-            items
-        } = req.body;
-        if (!Array.isArray(items) || items.length === 0) {
+        const { items } = req.body;
+        const result = await doBulkUpsert(req, items);
+        res.json(result);
+    } catch (err) {
+        console.error('Bulk upsert error:', err);
+        res.status(err.statusCode || 500).json({
+            success: false,
+            error: err.message || 'Lỗi khi cập nhật dữ liệu',
+        });
+    }
+};
+
+/** Bí danh tên cột thường gặp khi import (độ dốc địa hình, lượng mưa, ...) */
+const HEADER_ALIASES_BY_CODE = {
+    H: ['độ dốc địa hình', 'địa hình', 'terrain slope', 'elevation', 'độ cao'],
+    P: ['lượng mưa (m3/s)', 'lượng mưa', 'rainfall', 'mưa (mm)', 'precipitation'],
+    T: ['triều cường', 'tide'],
+    D: ['mật độ cống', 'drainage', 'cống'],
+    POP: ['dân số', 'population', 'mật độ dân'],
+};
+
+/**
+ * Map header CSV (dynamic) sang chỉ số: tìm cột chứa [code], tên chỉ số, hoặc bí danh.
+ */
+function mapHeadersToIndicators(rawHeaders, indicators) {
+    const trimLower = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const headers = rawHeaders.map((h) => trimLower(h));
+    const yearIdx = headers.findIndex((h) => h.includes('năm') || h.includes('year'));
+    const codeToId = Object.fromEntries(indicators.map((i) => [i.code, i._id.toString()]));
+    const indexByCode = {};
+    const used = new Set();
+    if (yearIdx >= 0) used.add(yearIdx);
+
+    for (const ind of indicators) {
+        const code = ind.code;
+        const namePart = (ind.name || code).trim().toLowerCase();
+        let idx = -1;
+        for (let i = 0; i < rawHeaders.length; i++) {
+            if (used.has(i)) continue;
+            const h = trimLower(rawHeaders[i]);
+            if (h.includes(`[${code.toLowerCase()}]`) || h.includes(`[${code}]`)) {
+                idx = i;
+                break;
+            }
+            if (namePart.length >= 2 && (h === namePart || h.includes(namePart))) {
+                idx = i;
+                break;
+            }
+            const aliases = HEADER_ALIASES_BY_CODE[code];
+            if (aliases && aliases.some((a) => h.includes(a))) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx >= 0) {
+            indexByCode[code] = { index: idx, indicator_id: ind._id.toString() };
+            used.add(idx);
+        }
+    }
+    return { yearIdx, indexByCode, codeToId };
+}
+
+/** Tìm chỉ số cột "Phường/Xã" (hoặc tương đương) để import nhiều đơn vị trong một file. */
+function findWardColumnIndex(rawHeaders) {
+    const trimLower = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const labels = ['phường/xã', 'phường xã', 'phuong/xa', 'ward', 'đơn vị', 'don vi', 'tên phường', 'ten phuong'];
+    for (let i = 0; i < rawHeaders.length; i++) {
+        const h = trimLower(rawHeaders[i]);
+        if (labels.some((l) => h.includes(l) || h === l)) return i;
+    }
+    return -1;
+}
+
+/** Chuẩn hóa tên phường để so khớp (lowercase, trim, 1 space). */
+function normalizeWardName(s) {
+    return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+/** Bỏ dấu tiếng Việt để so khớp linh hoạt (An Phu vs An Phú). */
+function removeVietnameseTone(str) {
+    const from = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ';
+    const to = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
+    let out = (str || '').toLowerCase();
+    for (let i = 0; i < from.length; i++) out = out.replace(new RegExp(from[i], 'g'), to[i]);
+    return out.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * POST /indicator-values/upload-csv
+ * Body: multipart/form-data với file (CSV). unit_id tùy chọn nếu file có cột "Phường/Xã".
+ * - Có cột "Phường/Xã": import nhiều phường/xã trong một file (khớp tên với DB).
+ * - Không có: bắt buộc unit_id (một phường).
+ * Map cột: "độ dốc địa hình" -> H, "lượng mưa (m3/s)" -> P, v.v.
+ */
+const uploadCsv = async (req, res) => {
+    try {
+        if (!req.file || !req.file.buffer) {
             return res.status(400).json({
                 success: false,
-                error: 'items là mảng bắt buộc'
+                error: 'Vui lòng chọn file CSV để tải lên',
             });
         }
-        if (req.user?.role === 'WARD_ADMIN' && req.user.ward_id) {
-            const wardIdStr = req.user.ward_id.toString?.() || req.user.ward_id;
-            const invalid = items.some((it) => (it.unit_id?.toString?.() || it.unit_id) !== wardIdStr);
-            if (invalid) {
+        const unitIdBody = (req.body && req.body.unit_id) ? String(req.body.unit_id).trim() : '';
+        const wardAdminId = req.user?.role === 'WARD_ADMIN' && req.user.ward_id
+            ? (req.user.ward_id.toString?.() || req.user.ward_id)
+            : null;
+
+        const indicators = await FloodIndicator.find({}).sort({ code: 1 }).select('_id code name unit').lean();
+        if (indicators.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Chưa có chỉ số nào trong hệ thống. Vui lòng cấu hình tại Quản lý chỉ số.',
+            });
+        }
+
+        const raw = req.file.buffer.toString('utf8').replace(/^\uFEFF/, '');
+        const delimiter = raw.includes(';') && raw.split(';').length >= raw.split(',').length ? ';' : ',';
+        const records = parse(raw, {
+            bom: true,
+            skip_empty_lines: true,
+            relax_column_count: true,
+            delimiter,
+            trim: true,
+        });
+
+        if (!Array.isArray(records) || records.length < 2) {
+            return res.status(400).json({
+                success: false,
+                error: 'File CSV không có dữ liệu hoặc thiếu dòng tiêu đề',
+            });
+        }
+
+        const rawHeaders = records[0];
+        const wardColIdx = findWardColumnIndex(rawHeaders);
+        const singleUnitId = unitIdBody || null;
+
+        if (wardColIdx < 0 && !singleUnitId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Thiếu unit_id (chọn một phường/xã) hoặc file CSV phải có cột "Phường/Xã" để import nhiều đơn vị.',
+            });
+        }
+
+        if (wardColIdx < 0 && singleUnitId) {
+            if (wardAdminId && singleUnitId !== wardAdminId) {
                 return res.status(403).json({
                     success: false,
-                    error: 'Quản lý phường chỉ được cập nhật dữ liệu cho phường của mình',
+                    error: 'Quản lý phường chỉ được tải lên dữ liệu cho phường của mình',
+                });
+            }
+            const unit = await AdministrativeUnit.findById(singleUnitId).select('_id name').lean();
+            if (!unit) {
+                return res.status(404).json({ success: false, error: 'Không tìm thấy phường/xã với mã đã chọn' });
+            }
+        }
+
+        let unitNameToId = null;
+        if (wardColIdx >= 0) {
+            const units = await AdministrativeUnit.find({}).select('_id name').lean();
+            unitNameToId = new Map();
+            for (const u of units) {
+                const idStr = u._id.toString();
+                const key = normalizeWardName(u.name);
+                if (key) {
+                    unitNameToId.set(key, idStr);
+                    const keyNoTone = removeVietnameseTone(key);
+                    if (keyNoTone && keyNoTone !== key) unitNameToId.set(keyNoTone, idStr);
+                }
+            }
+            if (unitNameToId.size === 0) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Hệ thống chưa có đơn vị hành chính nào. Không thể khớp cột "Phường/Xã".',
                 });
             }
         }
-        const sanitizeId = (id) => {
-            if (id == null) return null;
-            const s = String(id).trim().replace(/^"+|"+$/g, '');
-            return s || null;
-        };
 
-        const results = [];
-        const groupsToRecompute = new Set();
-        for (const it of items) {
-            const {
-                unit_id,
-                indicator_id,
-                data_year,
-                year,
-                raw_value
-            } = it;
-            const cleanUnitId = sanitizeId(unit_id);
-            const cleanIndicatorId = sanitizeId(indicator_id);
-            const yr = parseInt(data_year || year, 10);
-            if (!cleanUnitId || !cleanIndicatorId || isNaN(yr) || yr < 2000 || yr > 2100) {
-                continue;
-            }
-            const filter = {
-                unit_id: cleanUnitId,
-                indicator_id: cleanIndicatorId,
-                data_year: yr
-            };
-            const update = {
-                raw_value,
-                normalized_value: 0.5, // placeholder, recomputeMinMaxNormalized sẽ ghi đè
-                updated_by: req.user._id,
-            };
-            const value = await IndicatorValue.findOneAndUpdate(filter, update, {
-                new: true,
-                upsert: true,
-                runValidators: true,
+        const { yearIdx, indexByCode } = mapHeadersToIndicators(rawHeaders, indicators);
+        const codesWithColumn = Object.keys(indexByCode);
+        if (codesWithColumn.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Không nhận diện được cột chỉ số nào. Cần ít nhất một cột như: Năm, Phường/Xã, độ dốc địa hình, lượng mưa (m3/s), hoặc tên chỉ số [Mã].',
             });
-            results.push(value);
-            groupsToRecompute.add(`${indicator_id}|${yr}`);
         }
-        for (const key of groupsToRecompute) {
-            const [indicatorId, yr] = key.split('|');
-            await recomputeMinMaxNormalized(indicatorId, parseInt(yr));
+        if (yearIdx < 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Không tìm thấy cột năm (Năm / năm / year). Vui lòng kiểm tra file CSV.',
+            });
         }
-        const populatedResults = await IndicatorValue.find({
-                _id: {
-                    $in: results.map((r) => r._id)
+
+        const items = [];
+        const currentYear = new Date().getFullYear();
+        const skippedNoWard = { count: 0 };
+        for (let i = 1; i < records.length; i++) {
+            const row = records[i];
+            if (!Array.isArray(row) || row.length === 0) continue;
+            const yearVal = parseInt(String(row[yearIdx] || '').trim(), 10);
+            const year = (!isNaN(yearVal) && yearVal >= 2000 && yearVal <= 2100) ? yearVal : currentYear;
+
+            let unitId = singleUnitId;
+            if (wardColIdx >= 0 && unitNameToId) {
+                const wardName = normalizeWardName(row[wardColIdx]);
+                unitId = unitNameToId.get(wardName) || unitNameToId.get(removeVietnameseTone(wardName)) || null;
+                if (!unitId) {
+                    skippedNoWard.count++;
+                    continue;
                 }
-            })
-            .populate('unit_id', 'name')
-            .populate('indicator_id', 'code name');
+            }
+            if (wardAdminId && unitId !== wardAdminId) continue;
+
+            for (const code of codesWithColumn) {
+                const { index, indicator_id } = indexByCode[code];
+                const rawVal = parseFloat(String(row[index] || '0').trim()) || 0;
+                items.push({
+                    unit_id: unitId,
+                    indicator_id,
+                    data_year: year,
+                    raw_value: Math.max(0, rawVal),
+                });
+            }
+        }
+
+        if (items.length === 0) {
+            const msg = skippedNoWard.count > 0
+                ? `Không có dòng nào khớp với tên phường/xã trong hệ thống (đã bỏ qua ${skippedNoWard.count} dòng). Kiểm tra cột "Phường/Xã" và tên trong Quản lý phường/xã.`
+                : 'Không có dòng dữ liệu hợp lệ trong file CSV.';
+            return res.status(400).json({ success: false, error: msg });
+        }
+
+        const result = await doBulkUpsert(req, items);
+        const extra = skippedNoWard.count > 0 ? ` (đã bỏ qua ${skippedNoWard.count} dòng không khớp tên phường/xã)` : '';
         res.json({
-            success: true,
-            data: populatedResults,
-            count: populatedResults.length
+            ...result,
+            message: `Đã import ${result.count} bản ghi chỉ số.${extra}`,
         });
     } catch (err) {
-        console.error('Bulk upsert error:', err);
-        res.status(500).json({
+        console.error('Upload CSV error:', err);
+        res.status(err.statusCode || 500).json({
             success: false,
-            error: err.message
+            error: err.message || 'Lỗi khi xử lý file CSV',
         });
     }
 };
@@ -400,10 +666,12 @@ const bulkUpsert = async (req, res) => {
 module.exports = {
     getValues,
     getValueById,
+    getAvailableYears,
     createValue,
     updateValue,
     upsertValue,
     deleteValue,
     bulkUpsert,
     downloadTemplate,
+    uploadCsv,
 };

@@ -1,19 +1,23 @@
 const express = require("express");
+const multer = require("multer");
 const {
   getValues,
   getValueById,
+  getAvailableYears,
   createValue,
   updateValue,
   upsertValue,
   deleteValue,
   bulkUpsert,
   downloadTemplate,
+  uploadCsv,
 } = require("../controllers/indicatorValueController");
 const { protect, authorize } = require("../middleware/auth");
 const { validateYup } = require("../middleware/yupValidator");
 const yup = require("yup");
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 const bulkUpsertSchema = yup.object().shape({
   items: yup
@@ -46,10 +50,17 @@ const bulkUpsertSchema = yup.object().shape({
 });
 
 router.get("/", getValues);
+router.get("/years", getAvailableYears);
 router.get("/template", protect, authorize("SUPER_ADMIN", "WARD_ADMIN"), downloadTemplate);
 router.get("/:id", getValueById);
 
 router.use(protect);
+router.post(
+  "/upload-csv",
+  authorize("SUPER_ADMIN", "WARD_ADMIN"),
+  upload.single("file"),
+  uploadCsv,
+);
 router.post(
   "/bulk-upsert",
   authorize("SUPER_ADMIN", "WARD_ADMIN"),

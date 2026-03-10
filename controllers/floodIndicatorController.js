@@ -121,9 +121,17 @@ const deleteIndicator = async (req, res) => {
                 error: 'Không tìm thấy yếu tố'
             });
         }
+        // Tự động tính lại trọng số AHP: phân bổ đều cho các chỉ số còn lại (tổng = 1)
+        const remaining = await FloodIndicator.find({}).sort({ code: 1 }).lean();
+        if (remaining.length > 0) {
+            const weight = 1 / remaining.length;
+            for (const ind of remaining) {
+                await FloodIndicator.findByIdAndUpdate(ind._id, { weight });
+            }
+        }
         res.json({
             success: true,
-            message: 'Đã xóa'
+            message: 'Đã xóa và cập nhật trọng số AHP cho các chỉ số còn lại'
         });
     } catch (err) {
         console.error('Delete indicator error:', err);
