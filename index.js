@@ -9,6 +9,7 @@ const floodIndicatorRoutes = require("./routes/floodIndicatorRoutes");
 const { protect, authorize } = require("./middleware/auth");
 const { updateWeights } = require("./controllers/floodIndicatorController");
 const indicatorValueRoutes = require("./routes/indicatorValueRoutes");
+const indicatorThresholdRoutes = require("./routes/indicatorThresholdRoutes");
 const riskAssessmentRoutes = require("./routes/riskAssessmentRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const mapRoutes = require("./routes/mapRoutes");
@@ -45,6 +46,7 @@ app.patch(
 );
 app.use("/api/flood-indicators", floodIndicatorRoutes);
 app.use("/api/indicator-values", indicatorValueRoutes);
+app.use("/api/indicator-thresholds", indicatorThresholdRoutes);
 app.use("/api/risk-assessments", riskAssessmentRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/map", mapRoutes);

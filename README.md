@@ -110,6 +110,14 @@ Khi khởi động server lần đầu, hệ thống sẽ tự động tạo tà
 - `PUT /api/road-bridge/:id` - Cập nhật dữ liệu đường sá và cầu
 - `DELETE /api/road-bridge/:id` - Xóa dữ liệu đường sá và cầu
 
+### Indicator Thresholds (Ngưỡng chỉ số)
+
+- `GET /api/indicator-thresholds` - Lấy danh sách ngưỡng (query: `unit_id?`, `indicator_id?`)
+- `GET /api/indicator-thresholds/:id` - Lấy ngưỡng theo ID
+- `POST /api/indicator-thresholds` - Tạo ngưỡng (SUPER_ADMIN)
+- `PUT /api/indicator-thresholds/:id` - Cập nhật ngưỡng (SUPER_ADMIN)
+- `DELETE /api/indicator-thresholds/:id` - Xóa ngưỡng (SUPER_ADMIN)
+
 ### Settings
 
 - `GET /api/settings` - Lấy cài đặt hệ thống

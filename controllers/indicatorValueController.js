@@ -1,6 +1,7 @@
 const IndicatorValue = require('../models/IndicatorValue');
 const AdministrativeUnit = require('../models/AdministrativeUnit');
 const FloodIndicator = require('../models/FloodIndicator');
+const IndicatorThreshold = require('../models/IndicatorThreshold');
 const { parse } = require('csv-parse/sync');
 
 /**
@@ -104,14 +105,15 @@ const downloadTemplate = async (req, res) => {
 };
 
 /**
- * Chuẩn hóa Min-Max theo direction của FloodIndicator:
- * - Thuận (direction=1): normalized = (giá trị − min) / (max − min) — càng cao càng rủi ro
- * - Nghịch (direction=0): normalized = (max − giá trị) / (max − min) — càng cao càng an toàn
+ * Chuẩn hóa theo x_min, x_max từ bảng indicator_thresholds (theo từng phường + chỉ số).
+ * Nếu có ngưỡng cho (unit_id, indicator_id): dùng x_min, x_max đó.
+ * Nếu không có: fallback min/max từ toàn bộ raw_value cùng chỉ số + năm.
+ * - Thuận (direction=1): normalized = (raw − min) / (max − min)
+ * - Nghịch (direction=0): normalized = (max − raw) / (max − min)
  */
 async function recomputeMinMaxNormalized(indicatorId, dataYear) {
     const indicator = await FloodIndicator.findById(indicatorId).select('code direction');
     if (!indicator) return;
-    // direction=0 nghịch, direction=1 (hoặc undefined) thuận
     const isInverse = indicator.direction === 0;
 
     const values = await IndicatorValue.find({
@@ -120,12 +122,34 @@ async function recomputeMinMaxNormalized(indicatorId, dataYear) {
     });
     if (values.length === 0) return;
 
+    const thresholds = await IndicatorThreshold.find({ indicator_id: indicatorId })
+        .select('unit_id x_min x_max')
+        .lean();
+    const thresholdByUnit = new Map();
+    for (const t of thresholds) {
+        const uid = (t.unit_id && t.unit_id._id ? t.unit_id._id : t.unit_id).toString();
+        thresholdByUnit.set(uid, { x_min: t.x_min, x_max: t.x_max });
+    }
+
     const rawValues = values.map((v) => v.raw_value);
-    const min = Math.min(...rawValues);
-    const max = Math.max(...rawValues);
-    const range = max - min;
+    const groupMin = Math.min(...rawValues);
+    const groupMax = Math.max(...rawValues);
+    const groupRange = groupMax - groupMin;
 
     for (const v of values) {
+        const unitIdStr = (v.unit_id && v.unit_id._id ? v.unit_id._id : v.unit_id).toString();
+        const th = thresholdByUnit.get(unitIdStr);
+        let min, max, range;
+        if (th && th.x_min != null && th.x_max != null && th.x_max !== th.x_min) {
+            min = th.x_min;
+            max = th.x_max;
+            range = max - min;
+        } else {
+            min = groupMin;
+            max = groupMax;
+            range = groupRange;
+        }
+
         let n;
         if (range === 0) {
             n = 0.5;
@@ -439,12 +463,25 @@ const HEADER_ALIASES_BY_CODE = {
 };
 
 /**
+ * Parse số từ ô CSV: hỗ trợ dấu phẩy thập phân (1,5 → 1.5), trim, trả về NaN nếu không hợp lệ.
+ */
+function parseNumberFromCell(cell) {
+    if (cell == null) return NaN;
+    let s = String(cell).trim().replace(/\s+/g, '');
+    if (s === '' || s === '-') return NaN;
+    s = s.replace(/,/g, '.');
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : NaN;
+}
+
+/**
  * Map header CSV (dynamic) sang chỉ số: tìm cột chứa [code], tên chỉ số, hoặc bí danh.
  */
 function mapHeadersToIndicators(rawHeaders, indicators) {
     const trimLower = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
     const headers = rawHeaders.map((h) => trimLower(h));
-    const yearIdx = headers.findIndex((h) => h.includes('năm') || h.includes('year'));
+    let yearIdx = headers.findIndex((h) => h.includes('năm') || h.includes('year'));
+    if (yearIdx < 0) yearIdx = 0;
     const codeToId = Object.fromEntries(indicators.map((i) => [i.code, i._id.toString()]));
     const indexByCode = {};
     const used = new Set();
@@ -602,21 +639,20 @@ const uploadCsv = async (req, res) => {
                 error: 'Không nhận diện được cột chỉ số nào. Cần ít nhất một cột như: Năm, Phường/Xã, độ dốc địa hình, lượng mưa (m3/s), hoặc tên chỉ số [Mã].',
             });
         }
-        if (yearIdx < 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'Không tìm thấy cột năm (Năm / năm / year). Vui lòng kiểm tra file CSV.',
-            });
-        }
-
         const items = [];
-        const currentYear = new Date().getFullYear();
         const skippedNoWard = { count: 0 };
+        const skippedInvalidYear = { count: 0 };
         for (let i = 1; i < records.length; i++) {
             const row = records[i];
             if (!Array.isArray(row) || row.length === 0) continue;
-            const yearVal = parseInt(String(row[yearIdx] || '').trim(), 10);
-            const year = (!isNaN(yearVal) && yearVal >= 2000 && yearVal <= 2100) ? yearVal : currentYear;
+
+            const yearCell = row[yearIdx];
+            const yearVal = parseInt(String(yearCell != null ? yearCell : '').trim(), 10);
+            if (isNaN(yearVal) || yearVal < 2000 || yearVal > 2100) {
+                skippedInvalidYear.count++;
+                continue;
+            }
+            const year = yearVal;
 
             let unitId = singleUnitId;
             if (wardColIdx >= 0 && unitNameToId) {
@@ -631,25 +667,33 @@ const uploadCsv = async (req, res) => {
 
             for (const code of codesWithColumn) {
                 const { index, indicator_id } = indexByCode[code];
-                const rawVal = parseFloat(String(row[index] || '0').trim()) || 0;
+                const cell = index < row.length ? row[index] : undefined;
+                const rawVal = parseNumberFromCell(cell);
+                const value = Number.isFinite(rawVal) ? Math.max(0, rawVal) : 0;
                 items.push({
                     unit_id: unitId,
                     indicator_id,
                     data_year: year,
-                    raw_value: Math.max(0, rawVal),
+                    raw_value: value,
                 });
             }
         }
 
         if (items.length === 0) {
-            const msg = skippedNoWard.count > 0
-                ? `Không có dòng nào khớp với tên phường/xã trong hệ thống (đã bỏ qua ${skippedNoWard.count} dòng). Kiểm tra cột "Phường/Xã" và tên trong Quản lý phường/xã.`
-                : 'Không có dòng dữ liệu hợp lệ trong file CSV.';
+            const parts = [];
+            if (skippedNoWard.count > 0) parts.push(`${skippedNoWard.count} dòng không khớp tên phường/xã`);
+            if (skippedInvalidYear.count > 0) parts.push(`${skippedInvalidYear.count} dòng có năm không hợp lệ (2000–2100)`);
+            const msg = parts.length > 0
+                ? `Không có dòng nào hợp lệ. Đã bỏ qua: ${parts.join('; ')}. Kiểm tra cột Năm và Phường/Xã.`
+                : 'Không có dòng dữ liệu hợp lệ trong file CSV. Cần ít nhất một dòng có năm hợp lệ (2000–2100).';
             return res.status(400).json({ success: false, error: msg });
         }
 
         const result = await doBulkUpsert(req, items);
-        const extra = skippedNoWard.count > 0 ? ` (đã bỏ qua ${skippedNoWard.count} dòng không khớp tên phường/xã)` : '';
+        const extraParts = [];
+        if (skippedNoWard.count > 0) extraParts.push(`${skippedNoWard.count} dòng không khớp phường/xã`);
+        if (skippedInvalidYear.count > 0) extraParts.push(`${skippedInvalidYear.count} dòng năm không hợp lệ`);
+        const extra = extraParts.length > 0 ? ` (đã bỏ qua: ${extraParts.join('; ')})` : '';
         res.json({
             ...result,
             message: `Đã import ${result.count} bản ghi chỉ số.${extra}`,
